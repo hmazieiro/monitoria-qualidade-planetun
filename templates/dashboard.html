@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Monitoria da Qualidade{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+
+    @media (max-width: 992px) {
+        .filter-row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 992px) {
+        .kpi-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .kpi-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .kpi-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #007dfe;
+    }
+
+    .kpi-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .kpi-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .kpi-card.danger {
+        border-left-color: #e74c3c;
+    }
+
+    .kpi-card.warning {
+        border-left-color: #ff850a;
+    }
+
+    .kpi-card.success {
+        border-left-color: #28a745;
+    }
+
+    .chart-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    .chart-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .table-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background-color: #00266d;
+    }
+
+    .table thead th {
+        color: white !important;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .score-excellent {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .score-good {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .score-fair {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    .score-poor {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #ff850a, #e07000);
+        border: none;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    .btn-filter:hover {
+        background: linear-gradient(135deg, #e07000, #c06000);
+        color: white;
+    }
+
+    .chart-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 992px) {
+        .chart-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Dashboard de Qualidade</h1>
+        <p class="text-muted">Análise de monitorias e desempenho dos peritos</p>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filter-section">
+    <div class="filter-row">
+        <div>
+            <label for="selectMes" class="form-label">Mês</label>
+            <select class="form-select" id="selectMes">
+                <option value="">-- Todos os meses --</option>
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}">{{ ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'][m] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="selectAno" class="form-label">Ano</label>
+            <select class="form-select" id="selectAno">
+                <option value="">-- Todos os anos --</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+            </select>
+        </div>
+        {% if usuario.perfil == 'supervisor' %}
+        <div>
+            <label for="selectPerito" class="form-label">Perito</label>
+            <select class="form-select" id="selectPerito">
+                <option value="">-- Todos os peritos --</option>
+                {% for perito in peritos %}
+                <option value="{{ perito.id }}">{{ perito.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="selectSupervisor" class="form-label">Supervisor</label>
+            <select class="form-select" id="selectSupervisor">
+                <option value="">-- Todos os supervisores --</option>
+                {% for supervisor in supervisores %}
+                <option value="{{ supervisor.id }}">{{ supervisor.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+        <input type="hidden" id="selectPerito" value="{{ usuario.id }}">
+        {% endif %}
+        <button class="btn btn-filter" id="btnFilter">Filtrar</button>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-row">
+    <div class="kpi-card">
+        <div class="kpi-label">Total de Monitorias</div>
+        <div class="kpi-value" id="kpiTotal">0</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Nota Média</div>
+        <div class="kpi-value" id="kpiMedia">0</div>
+    </div>
+    <div class="kpi-card danger">
+        <div class="kpi-label">% Falhas Gravíssimas</div>
+        <div class="kpi-value" id="kpiGravissima">0%</div>
+    </div>
+    <div class="kpi-card success">
+        <div class="kpi-label">% Conformidade (Nota=100)</div>
+        <div class="kpi-value" id="kpiConformidade">0%</div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="chart-row">
+    <div class="chart-container">
+        <div class="chart-title">Nota Média por Perito</div>
+        <canvas id="chartPeritos" style="max-height: 300px;"></canvas>
+    </div>
+    <div class="chart-container">
+        <div class="chart-title">Evolução da Nota Média (Últimos 12 Meses)</div>
+        <canvas id="chartEvolucao" style="max-height: 300px;"></canvas>
+    </div>
+</div>
+
+<div class="chart-row">
+    <div class="chart-container">
+        <div class="chart-title">Distribuição de Falhas</div>
+        <canvas id="chartFalhas" style="max-height: 300px;"></canvas>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="table-container">
+    <div class="chart-title">Últimas Monitorias</div>
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabelaMonitorias">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Perito</th>
+                    <th>Supervisor</th>
+                    <th>Cliente</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaCorpo">
+                <tr>
+                    <td colspan="5" class="no-data">Carregando dados...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    let chartPeritos = null;
+    let chartEvolucao = null;
+    let chartFalhas = null;
+
+    function getScoreBadgeClass(score) {
+        if (score === 100) return 'score-excellent';
+        if (score >= 80) return 'score-good';
+        if (score >= 50) return 'score-fair';
+        return 'score-poor';
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('pt-BR');
+    }
+
+    async function loadDashboardData() {
+        const mes = document.getElementById('selectMes').value;
+        const ano = document.getElementById('selectAno').value;
+        const perito_id = document.getElementById('selectPerito').value;
+        const supervisor_id = document.getElementById('selectSupervisor').value;
+
+        const params = new URLSearchParams();
+        if (mes) params.append('mes', mes);
+        if (ano) params.append('ano', ano);
+        if (perito_id) params.append('perito_id', perito_id);
+        if (supervisor_id) params.append('supervisor_id', supervisor_id);
+
+        try {
+            const response = await fetch(`/api/dashboard-data?${params}`);
+            const data = await response.json();
+
+            // Update KPIs
+            document.getElementById('kpiTotal').textContent = data.kpis.total_monitorias;
+            document.getElementById('kpiMedia').textContent = data.kpis.nota_media.toFixed(2);
+            document.getElementById('kpiGravissima').textContent = data.kpis.pct_gravissima.toFixed(1) + '%';
+            document.getElementById('kpiConformidade').textContent = data.kpis.pct_conformidade.toFixed(1) + '%';
+
+            // Chart 1: Peritos
+            const ctxPeritos = document.getElementById('chartPeritos').getContext('2d');
+            if (chartPeritos) chartPeritos.destroy();
+            chartPeritos = new Chart(ctxPeritos, {
+                type: 'bar',
+                data: {
+                    labels: data.peritos.labels,
+                    datasets: [{
+                        label: 'Nota Média',
+                        data: data.peritos.data,
+                        backgroundColor: '#007dfe',
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Evolution
+            const ctxEvolucao = document.getElementById('chartEvolucao').getContext('2d');
+            if (chartEvolucao) chartEvolucao.destroy();
+            chartEvolucao = new Chart(ctxEvolucao, {
+                type: 'line',
+                data: {
+                    labels: data.monthly.labels,
+                    datasets: [{
+                        label: 'Nota Média',
+                        data: data.monthly.data,
+                        borderColor: '#007dfe',
+                        backgroundColor: 'rgba(0, 125, 254, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#007dfe',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Failures
+            const ctxFalhas = document.getElementById('chartFalhas').getContext('2d');
+            if (chartFalhas) chartFalhas.destroy();
+            chartFalhas = new Chart(ctxFalhas, {
+                type: 'doughnut',
+                data: {
+                    labels: data.failures.labels,
+                    datasets: [{
+                        data: data.failures.data,
+                        backgroundColor: [
+                            '#28a745',
+                            '#007dfe',
+                            '#ff850a',
+                            '#e74c3c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Table
+            const tbody = document.getElementById('tabelaCorpo');
+            if (data.ultimas_monitorias.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma monitoria encontrada</td></tr>';
+            } else {
+                tbody.innerHTML = data.ultimas_monitorias.map(m => `
+                    <tr>
+                        <td>${formatDate(m.data)}</td>
+                        <td>${m.perito}</td>
+                        <td>${m.supervisor}</td>
+                        <td>${m.cliente}</td>
+                        <td><span class="score-badge ${getScoreBadgeClass(m.nota)}">${m.nota}</span></td>
+                    </tr>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            alert('Erro ao carregar dados do dashboard');
+        }
+    }
+
+    document.getElementById('btnFilter').addEventListener('click', loadDashboardData);
+
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+    // Set current year as default
+    const currentYear = new Date().getFullYear();
+    const selectAno = document.getElementById('selectAno');
+    selectAno.value = currentYear;
+</script>
+{% endblock %}
