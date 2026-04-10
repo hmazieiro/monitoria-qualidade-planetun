@@ -453,9 +453,9 @@
                 tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma monitoria encontrada</td></tr>';
             } else {
                 tbody.innerHTML = data.ultimas_monitorias.map(m => `
-                    <tr>
+                    <tr style="cursor:pointer;" onclick="window.location.href='/monitoria/${m.id}'">
                         <td>${formatDate(m.data)}</td>
-                        <td>${m.perito}</td>
+                        <td><a href="/monitoria/${m.id}" class="text-decoration-none fw-semibold" style="color:#007dfe;">${m.perito}</a></td>
                         <td>${m.supervisor}</td>
                         <td>${m.cliente}</td>
                         <td><span class="score-badge ${getScoreBadgeClass(m.nota)}">${m.nota}</span></td>
