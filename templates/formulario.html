@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Formulário de Monitoria - Monitoria da Qualidade{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-header {
+        padding: 1rem 1.5rem;
+        border-radius: 8px 8px 0 0;
+        color: white;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 0;
+    }
+
+    .section-gravissima {
+        background: linear-gradient(135deg, #c0392b, #e74c3c);
+    }
+
+    .section-grave {
+        background: linear-gradient(135deg, #e07000, #ff850a);
+    }
+
+    .section-leve {
+        background: linear-gradient(135deg, #00266d, #007dfe);
+    }
+
+    .section-content {
+        border: 1px solid #ddd;
+        border-top: none;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .item-group {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        border-left: 4px solid #ddd;
+    }
+
+    .item-group.checked {
+        background-color: #fff3cd;
+        border-left-color: #dc3545;
+    }
+
+    .item-number {
+        display: inline-block;
+        background-color: #6c757d;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 2rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+    }
+
+    .item-title {
+        font-weight: 600;
+        color: #333;
+        margin-left: 2.5rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .item-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-left: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+    }
+
+    .form-check {
+        margin-left: 2.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .score-box {
+        background: linear-gradient(135deg, #00266d 0%, #007dfe 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 38, 109, 0.3);
+    }
+
+    .score-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .score-value {
+        font-size: 3.5rem;
+        font-weight: 700;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #ff850a, #e07000);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        width: 100%;
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #e07000, #c06000);
+        color: white;
+    }
+
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Formulário de Monitoria de Qualidade</h1>
+        <p class="text-muted">Preencha os dados abaixo para registrar uma nova monitoria</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="/formulario">
+            <!-- Score Display -->
+            <div class="score-box">
+                <div class="score-label">Nota Final Calculada</div>
+                <div class="score-value" id="scoreValue">100</div>
+            </div>
+
+            <!-- Section 1: Dados da Monitoria -->
+            <h5 class="form-section-title">Dados da Monitoria</h5>
+
+            <div class="form-row">
+                <div>
+                    <label for="colaborador_id" class="form-label">Colaborador Avaliado (Perito)</label>
+                    <select class="form-select" id="colaborador_id" name="colaborador_id" required>
+                        <option value="">-- Selecione um perito --</option>
+                        {% for perito in peritos %}
+                        <option value="{{ perito.id }}">{{ perito.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="cliente_id" class="form-label">Cliente</label>
+                    <select class="form-select" id="cliente_id" name="cliente_id" required>
+                        <option value="">-- Selecione um cliente --</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="avaliador" class="form-label">Avaliador (Supervisor)</label>
+                    <input type="text" class="form-control" id="avaliador" value="{{ avaliador_nome }}" disabled>
+                </div>
+                <div>
+                    <label for="numero_processo" class="form-label">Número do Processo</label>
+                    <input type="text" class="form-control" id="numero_processo" name="numero_processo">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="data_monitoria" class="form-label">Data da Monitoria</label>
+                    <input type="date" class="form-control" id="data_monitoria" name="data_monitoria" required>
+                </div>
+                <div>
+                    <label for="data_tratativa" class="form-label">Data da Tratativa</label>
+                    <input type="date" class="form-control" id="data_tratativa" name="data_tratativa">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="data_feedback" class="form-label">Data do Feedback</label>
+                    <input type="date" class="form-control" id="data_feedback" name="data_feedback">
+                </div>
+            </div>
+
+            <div>
+                <label for="observacoes" class="form-label">Observações do Gestor</label>
+                <textarea class="form-control" id="observacoes" name="observacoes" rows="4"></textarea>
+            </div>
+
+            <!-- Section 2: Itens de Avaliação -->
+            <h5 class="form-section-title">Itens de Avaliação</h5>
+
+            <!-- FALHA GRAVÍSSIMA -->
+            <div class="section-header section-gravissima">
+                🔴 FALHA GRAVÍSSIMA (Se marcado, nota = 0)
+            </div>
+            <div class="section-content">
+                {% for num in [1, 2, 3] %}
+                <div class="item-group" id="item-group-{{ num }}">
+                    <span class="item-number">{{ num }}</span>
+                    <span class="item-title">{{ items[num].nome }}</span>
+                    <span class="item-description">{{ items[num].descricao }}</span>
+                    <div class="form-check">
+                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
+                        <label class="form-check-label" for="item_{{ num }}">
+                            Falha encontrada
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- FALHA GRAVE -->
+            <div class="section-header section-grave">
+                🟠 FALHA GRAVE (Cada uma: -60 pontos)
+            </div>
+            <div class="section-content">
+                {% for num in [4, 5] %}
+                <div class="item-group" id="item-group-{{ num }}">
+                    <span class="item-number">{{ num }}</span>
+                    <span class="item-title">{{ items[num].nome }}</span>
+                    <span class="item-description">{{ items[num].descricao }}</span>
+                    <div class="form-check">
+                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
+                        <label class="form-check-label" for="item_{{ num }}">
+                            Falha encontrada
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- FALHA LEVE -->
+            <div class="section-header section-leve">
+                🔵 FALHA LEVE (Cada uma: -40 pontos)
+            </div>
+            <div class="section-content">
+                {% for num in [6, 7, 8] %}
+                <div class="item-group" id="item-group-{{ num }}">
+                    <span class="item-number">{{ num }}</span>
+                    <span class="item-title">{{ items[num].nome }}</span>
+                    <span class="item-description">{{ items[num].descricao }}</span>
+                    <div class="form-check">
+                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
+                        <label class="form-check-label" for="item_{{ num }}">
+                            Falha encontrada
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-success btn-submit">Salvar Monitoria</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function calculateScore() {
+        let score = 100;
+
+        // Check gravíssima (items 1-3)
+        const gravissima = [1, 2, 3].some(i => document.getElementById(`item_${i}`).checked);
+        if (gravissima) {
+            score = 0;
+        } else {
+            // Deduct for grave (items 4-5)
+            const graveCount = [4, 5].filter(i => document.getElementById(`item_${i}`).checked).length;
+            score -= graveCount * 60;
+
+            // Deduct for leve (items 6-8)
+            const leveCount = [6, 7, 8].filter(i => document.getElementById(`item_${i}`).checked).length;
+            score -= leveCount * 40;
+        }
+
+        score = Math.max(0, score);
+        document.getElementById('scoreValue').textContent = score;
+
+        // Update visual feedback
+        for (let i = 1; i <= 8; i++) {
+            const itemGroup = document.getElementById(`item-group-${i}`);
+            if (document.getElementById(`item_${i}`).checked) {
+                itemGroup.classList.add('checked');
+            } else {
+                itemGroup.classList.remove('checked');
+            }
+        }
+    }
+
+    document.querySelectorAll('.score-trigger').forEach(checkbox => {
+        checkbox.addEventListener('change', calculateScore);
+    });
+
+    // Set today's date as default
+    document.getElementById('data_monitoria').valueAsDate = new Date();
+</script>
+{% endblock %}
