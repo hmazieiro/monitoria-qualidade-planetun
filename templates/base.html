@@ -12,24 +12,91 @@
             --planetun-orange: #ff850a;
             --planetun-light: #e8f0fe;
         }
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background: linear-gradient(135deg, var(--planetun-dark) 0%, #003a8c 100%); box-shadow: 0 2px 8px rgba(0, 38, 109, 0.3); padding: 0.6rem 1rem; }
-        .navbar-brand { font-weight: 700; font-size: 1.4rem; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
-        .navbar-brand img { height: 36px; border-radius: 4px; }
-        .navbar a { color: white !important; font-weight: 500; margin-left: 1.5rem; transition: opacity 0.3s; }
-        .navbar a:hover { opacity: 0.85; }
-        .navbar-text { color: rgba(255,255,255,0.85); font-size: 0.9rem; }
-        .container-main { padding: 2rem 0; }
-        .card { border: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border-radius: 8px; }
-        .btn-primary { background-color: var(--planetun-blue); border-color: var(--planetun-blue); }
-        .btn-primary:hover { background-color: var(--planetun-dark); border-color: var(--planetun-dark); }
-        .btn-accent { background-color: var(--planetun-orange); border-color: var(--planetun-orange); color: white; }
-        .btn-accent:hover { background-color: #e07000; border-color: #e07000; color: white; }
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--planetun-dark) 0%, #003a8c 100%);
+            box-shadow: 0 2px 8px rgba(0, 38, 109, 0.3);
+            padding: 0.6rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand img {
+            height: 36px;
+            border-radius: 4px;
+        }
+
+        .navbar a {
+            color: white !important;
+            font-weight: 500;
+            margin-left: 1.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .navbar a:hover {
+            opacity: 0.85;
+        }
+
+        .navbar-text {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.9rem;
+        }
+
+        .container-main {
+            padding: 2rem 0;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--planetun-blue);
+            border-color: var(--planetun-blue);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--planetun-dark);
+            border-color: var(--planetun-dark);
+        }
+
+        .btn-accent {
+            background-color: var(--planetun-orange);
+            border-color: var(--planetun-orange);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #e07000;
+            border-color: #e07000;
+            color: white;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+            padding: 1rem 0 0.5rem 0;
+        }
+
         .text-planetun { color: var(--planetun-blue); }
         .text-planetun-dark { color: var(--planetun-dark); }
         .bg-planetun { background-color: var(--planetun-blue); }
         .bg-planetun-dark { background-color: var(--planetun-dark); }
         .bg-planetun-orange { background-color: var(--planetun-orange); }
+
         {% block extra_css %}{% endblock %}
     </style>
 </head>
@@ -46,7 +113,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center">
                     {% if session.usuario_perfil == 'supervisor' %}
-                    <a class="nav-link" href="/formulario">Formul\u00e1rio</a>
+                    <a class="nav-link" href="/formulario">Formulário</a>
                     {% endif %}
                     <a class="nav-link" href="/dashboard">Dashboard</a>
                     {% if session.usuario_nome %}
@@ -59,6 +126,7 @@
             </div>
         </div>
     </nav>
+
     <div class="container-fluid container-main">
         <div class="container">
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -71,9 +139,11 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+
             {% block content %}{% endblock %}
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
