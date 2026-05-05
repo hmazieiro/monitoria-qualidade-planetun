@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoria #997 - Monitoria da Qualidade</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --planetun-dark: #0f172a;
+            --planetun-blue: #2563eb;
+            --planetun-green: #10b981;
+            --planetun-orange: #f59e0b;
+            --planetun-red: #ef4444;
+            --planetun-gray: #64748b;
+            --planetun-light: #f8fafc;
+            --planetun-border: #e2e8f0;
+        }
+        body { background: var(--planetun-light); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #334155; margin: 0; }
+        /* SIDEBAR */
+        .sidebar { background: var(--planetun-dark); min-height: 100vh; width: 240px; position: fixed; top: 0; left: 0; z-index: 40; display: flex; flex-direction: column; }
+        .sidebar a { color: #94a3b8; display: block; padding: 10px 20px; font-size: 14px; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); border-left: 3px solid var(--planetun-blue); }
+        .main-content { margin-left: 240px; padding: 32px; min-height: 100vh; }
+        /* CARDS */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+        .card-hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); color: #fff; }
+        /* BADGES */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        /* BUTTONS */
+        .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-block; text-decoration: none; }
+        .btn-primary { background: var(--planetun-blue); color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-success { background: var(--planetun-green); color: #fff; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--planetun-red); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        /* FORMS */
+        input, select, textarea {
+            border: 1px solid var(--planetun-border); border-radius: 8px; padding: 8px 12px;
+            font-size: 14px; width: 100%; transition: border 0.2s; box-sizing: border-box;
+            font-family: inherit; color: #334155; background: #fff;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--planetun-blue); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover td { background: #f8fafc; }
+        /* STAT CARDS */
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 36px; font-weight: 800; color: var(--planetun-dark); }
+        .stat-card .label { font-size: 13px; color: var(--planetun-gray); margin-top: 4px; }
+        /* FLASH MESSAGES */
+        .flash-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-error { background: #fee2e2; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-warning { background: #fef3c7; color: #92400e; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; display: flex; flex-direction: row; overflow-x: auto; }
+            .sidebar a { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .sidebar a.active { border-left: none; border-bottom: 3px solid var(--planetun-blue); }
+            .sidebar .sidebar-brand { display: none; }
+            .main-content { margin-left: 0; padding: 16px; }
+        }
+        
+<style>
+    /* Item card */
+    .item-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .item-row.marcado { border-color: #fecaca; background: #fff7f6; }
+
+    /* Número dentro de círculo colorido pela categoria quando marcado */
+    .item-num {
+        flex-shrink: 0;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: 700;
+        background: #f1f5f9; color: #94a3b8;
+        border: 2px solid #e2e8f0;
+    }
+    .item-row.marcado.cat-GRAVISSIMA  .item-num,
+    .item-row.marcado.cat-GRAVÍSSIMA .item-num { background: var(--planetun-red);    color: #fff; border-color: var(--planetun-red); }
+    .item-row.marcado.cat-GRAVE      .item-num { background: var(--planetun-orange); color: #fff; border-color: var(--planetun-orange); }
+    .item-row.marcado.cat-LEVE       .item-num { background: var(--planetun-blue);   color: #fff; border-color: var(--planetun-blue); }
+
+    .item-nome { font-weight: 600; color: #0f172a; font-size: 14px; }
+    .item-desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .item-cat {
+        font-size: 11px; font-weight: 600; padding: 2px 8px;
+        border-radius: 999px; text-transform: uppercase; margin-left: 8px;
+        white-space: nowrap;
+    }
+    .cat-GRAVISSIMA, .cat-GRAVÍSSIMA { background: #fee2e2; color: #991b1b; }
+    .cat-GRAVE { background: #fef3c7; color: #92400e; }
+    .cat-LEVE  { background: #dbeafe; color: #1e40af; }
+
+    .item-status-ok { font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .item-status-falha { font-size: 12px; color: var(--planetun-red); font-weight: 700; }
+
+    /* Bloco de detalhes do item marcado */
+    .item-detalhe {
+        margin-top: 12px;
+        padding: 12px 14px;
+        background: #fafafa;
+        border-left: 3px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 13px;
+    }
+    .item-detalhe .label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.4px; color: #64748b; margin-bottom: 4px;
+    }
+    .item-detalhe p {
+        margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;
+    }
+    .anexos-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+    .anexo-link {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; background: #fff;
+        border: 1px solid #e2e8f0; border-radius: 6px;
+        text-decoration: none; color: #334155; font-size: 13px;
+    }
+    .anexo-link:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .anexo-icon {
+        width: 28px; height: 28px; border-radius: 6px;
+        background: #e0f2fe; color: #0369a1;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0;
+    }
+    .anexo-meta { color: #94a3b8; font-size: 12px; margin-left: auto; }
+
+    /* Bloco de réplica */
+    .replica-card {
+        background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+        padding: 24px; margin-bottom: 20px;
+    }
+    .replica-pendente { border-color: #fbbf24; background: #fffbeb; }
+    .replica-feita    { border-color: #10b981; background: #ecfdf5; }
+    .replica-discordo { border-color: #ef4444; background: #fef2f2; }
+    .replica-title {
+        font-size: 14px; font-weight: 700; color: #0f172a;
+        margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .decisao-row { display: flex; gap: 12px; margin: 14px 0; }
+    .btn-decisao {
+        flex: 1; padding: 14px; border-radius: 10px; cursor: pointer;
+        font-size: 14px; font-weight: 600; text-align: center;
+        border: 2px solid #e2e8f0; background: #fff; color: #334155;
+        transition: all 0.15s;
+    }
+    .btn-decisao:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .btn-decisao.sel-concordo {
+        border-color: var(--planetun-green); background: #d1fae5; color: #065f46;
+    }
+    .btn-decisao.sel-discordo {
+        border-color: var(--planetun-red); background: #fee2e2; color: #991b1b;
+    }
+    .replica-justificativa-wrap { display: none; }
+    .replica-justificativa-wrap.show { display: block; }
+</style>
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand" style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="static/logo_icon.png" alt="Planetun" style="height: 32px; border-radius: 4px;">
+                <div>
+                    <div style="color: #fff; font-size: 18px; font-weight: 800;">Planetun</div>
+                    <div style="color: #64748b; font-size: 12px;">Monitoria da Qualidade</div>
+                </div>
+            </div>
+        </div>
+        <nav style="padding: 12px 0; flex: 1;">
+            <a href="/dashboard" class="">📊 Dashboard</a>
+            
+            <a href="/historico" class="">📅 Histórico</a>
+            
+        </nav>
+        
+        <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="color: #94a3b8; font-size: 12px;">Logado como</div>
+            <div style="color: #fff; font-size: 14px; font-weight: 600;">Ana Souza</div>
+            <a href="/logout" style="color: #94a3b8; font-size: 12px; display: inline; padding: 0; margin-top: 4px;">Sair</a>
+        </div>
+        
+    </div>
+
+    <div class="main-content">
+        
+            
+        
+
+        
+
+
+<!-- Breadcrumb -->
+<div style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+    <a href="/historico" style="color: var(--planetun-blue); text-decoration: none;">Histórico</a>
+    <span style="margin: 0 8px;">/</span>
+    <span>Monitoria #997</span>
+</div>
+
+<!-- Header Hero -->
+
+
+
+<div class="card card-hero" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <div style="font-size: 13px; opacity: 0.7;">MONITORIA #997</div>
+        <div style="font-size: 22px; font-weight: 700; margin-top: 4px;">Ana Souza</div>
+        <div style="font-size: 13px; opacity: 0.7; margin-top: 4px;">Processo 2026-04-00256</div>
+    </div>
+    <div style="background: #f59e0b; padding: 12px 24px; border-radius: 12px; text-align: center; min-width: 100px;">
+        <div style="font-size: 36px; font-weight: 800;">20</div>
+        <div style="font-size: 11px; opacity: 0.8;">NOTA FINAL</div>
+    </div>
+</div>
+
+<!-- Info Grid -->
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Perito Avaliado</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Ana Souza</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Supervisor</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Henrique Mazieiro</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Cliente</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Porto Seguro</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Monitoria</div>
+            <div style="font-size: 14px; color: #334155;">2026-04-18</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Tratativa</div>
+            <div style="font-size: 14px; color: #334155;">—</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data do Feedback</div>
+            <div style="font-size: 14px; color: #334155;">—</div>
+        </div>
+    </div>
+</div>
+
+<!-- Itens Avaliados -->
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Itens Avaliados</h3>
+    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Critérios marcados em vermelho/laranja/azul indicam falhas. Os demais ficam em cinza.</p>
+    
+    
+    
+    
+    <div class="item-row  cat-GRAVÍSSIMA">
+        <div class="item-num">1</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Apontamentos Inadequados</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Deixou de fazer os devidos apontamentos da análise do risco no laudo...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row  cat-GRAVÍSSIMA">
+        <div class="item-num">2</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Conferência de Informações e fotos do Veículo</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Não conferiu os dados (modelo, placa e chassi)...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row  cat-GRAVÍSSIMA">
+        <div class="item-num">3</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Validação de Análise por IA</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Não realizou a conferência dos apontamentos sugeridos pela IA...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row  cat-GRAVE">
+        <div class="item-num">4</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Solicitação Indevida de Fotos</span>
+                <span class="item-cat cat-GRAVE">GRAVE</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Solicitou correções ou envio de fotos adicionais de maneira incorreta...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row  cat-GRAVE">
+        <div class="item-num">5</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Orçamentação Incorreta (aplicável a EA)</span>
+                <span class="item-cat cat-GRAVE">GRAVE</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Realizou orçamento incorreto, desconsiderando imagens, peças...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row  cat-LEVE">
+        <div class="item-num">6</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Preenchimento Incorreto de Dados</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+                
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                
+            </div>
+            <div class="item-desc">Erro no preenchimento das informações da vistoria...</div>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row marcado cat-LEVE">
+        <div class="item-num">7</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Falta de Registro de Solicitação de Fotos e/ou observações</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+                
+                <span class="item-status-falha" style="margin-left: auto;">● Falha apontada</span>
+                
+            </div>
+            <div class="item-desc">Não houve registro sobre solicitação de fotos adicionais...</div>
+
+            
+            <div class="item-detalhe">
+                
+                <div class="label">Observação do supervisor</div>
+                <p>Falta de registro formal das solicitações.</p>
+                
+                
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="item-row marcado cat-LEVE">
+        <div class="item-num">8</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">Relato de Avarias</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+                
+                <span class="item-status-falha" style="margin-left: auto;">● Falha apontada</span>
+                
+            </div>
+            <div class="item-desc">Não realizou o relato das avarias conforme as regras...</div>
+
+            
+            <div class="item-detalhe">
+                
+                <div class="label">Observação do supervisor</div>
+                <p>Fotos fora do padrão visual exigido.</p>
+                
+                
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+
+<!-- Observações gerais do gestor -->
+
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">📝 Observações gerais do gestor</h3>
+    <p style="font-size: 14px; color: #334155; white-space: pre-wrap; margin: 0;">Comunicação informal e fotos fora do padrão.</p>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- BLOCO DE RÉPLICA — perito e supervisor                         -->
+<!-- ============================================================== -->
+
+<!-- 1) Réplica do perito (já enviada) -->
+
+<div class="replica-card replica-discordo">
+    <div class="replica-title">
+        
+        ⚠️ Manifestação do perito — <span style="color: #991b1b;">NÃO CONCORDA</span>
+        
+    </div>
+    <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+        Ana Souza · 2026-04-19 09:15:00
+    </div>
+    
+    <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin-top: 12px; margin-bottom: 4px;">Justificativa</div>
+    <p style="margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;">Discordo do item 7. Eu registrei as solicitações via WhatsApp do cliente porque foi o canal pedido por ele.</p>
+    
+</div>
+
+
+<!-- 2) Formulário de réplica do PERITO (se ele ainda não respondeu) -->
+
+<!-- Perito já respondeu — exibe agradecimento -->
+<div style="text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px;">
+    Sua manifestação foi registrada e respondida pelo supervisor.
+</div>
+
+
+<!-- 3) Resposta do supervisor (já enviada) -->
+
+<div class="replica-card replica-feita">
+    <div class="replica-title">
+        
+        ✅ Resposta do supervisor — <span style="color: #065f46;">ACOLHE A MANIFESTAÇÃO DO PERITO</span>
+        
+    </div>
+    <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+        Henrique Mazieiro · 2026-04-19 16:40:00
+    </div>
+    
+    <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin-top: 12px; margin-bottom: 4px;">Justificativa</div>
+    <p style="margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;">Acolhida. Vou ajustar a avaliação do item 7 considerando o registro via WhatsApp como válido neste caso. Item 8 (fotos) permanece — vamos alinhar no próximo 1:1.</p>
+    
+</div>
+
+
+<!-- 4) Formulário do SUPERVISOR (se perito já replicou e supervisor ainda não) -->
+
+
+<!-- Back -->
+<a href="/historico" class="btn btn-secondary" style="margin-top: 8px;">← Voltar ao histórico</a>
+
+
+
+    </div>
+
+    
+<div style="position:fixed;bottom:16px;right:16px;background:#0f172a;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-family:monospace;z-index:99;box-shadow:0 4px 12px rgba(0,0,0,0.2);">CENÁRIO C_ciclo_completo</div></body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Monitoria - Monitoria da Qualidade</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --planetun-dark: #0f172a;
+            --planetun-blue: #2563eb;
+            --planetun-green: #10b981;
+            --planetun-orange: #f59e0b;
+            --planetun-red: #ef4444;
+            --planetun-gray: #64748b;
+            --planetun-light: #f8fafc;
+            --planetun-border: #e2e8f0;
+        }
+        body { background: var(--planetun-light); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #334155; margin: 0; }
+        /* SIDEBAR */
+        .sidebar { background: var(--planetun-dark); min-height: 100vh; width: 240px; position: fixed; top: 0; left: 0; z-index: 40; display: flex; flex-direction: column; }
+        .sidebar a { color: #94a3b8; display: block; padding: 10px 20px; font-size: 14px; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); border-left: 3px solid var(--planetun-blue); }
+        .main-content { margin-left: 240px; padding: 32px; min-height: 100vh; }
+        /* CARDS */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+        .card-hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); color: #fff; }
+        /* BADGES */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        /* BUTTONS */
+        .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-block; text-decoration: none; }
+        .btn-primary { background: var(--planetun-blue); color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-success { background: var(--planetun-green); color: #fff; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--planetun-red); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        /* FORMS */
+        input, select, textarea {
+            border: 1px solid var(--planetun-border); border-radius: 8px; padding: 8px 12px;
+            font-size: 14px; width: 100%; transition: border 0.2s; box-sizing: border-box;
+            font-family: inherit; color: #334155; background: #fff;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--planetun-blue); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover td { background: #f8fafc; }
+        /* STAT CARDS */
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 36px; font-weight: 800; color: var(--planetun-dark); }
+        .stat-card .label { font-size: 13px; color: var(--planetun-gray); margin-top: 4px; }
+        /* FLASH MESSAGES */
+        .flash-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-error { background: #fee2e2; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-warning { background: #fef3c7; color: #92400e; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; display: flex; flex-direction: row; overflow-x: auto; }
+            .sidebar a { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .sidebar a.active { border-left: none; border-bottom: 3px solid var(--planetun-blue); }
+            .sidebar .sidebar-brand { display: none; }
+            .main-content { margin-left: 0; padding: 16px; }
+        }
+        
+<style>
+    .section-header {
+        padding: 12px 20px;
+        border-radius: 8px 8px 0 0;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+    .section-gravissima { background: var(--planetun-red); }
+    .section-grave { background: var(--planetun-orange); }
+    .section-leve { background: var(--planetun-blue); }
+    .section-content {
+        border: 1px solid var(--planetun-border);
+        border-top: none;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 0 0 8px 8px;
+        background: #fff;
+    }
+    .item-group {
+        margin-bottom: 12px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 4px solid var(--planetun-border);
+        transition: all 0.2s;
+    }
+    .item-group.checked {
+        background: #fef3c7;
+        border-left-color: var(--planetun-red);
+    }
+    .item-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #64748b;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .item-title { font-weight: 600; color: #0f172a; font-size: 14px; }
+    .item-description { font-size: 13px; color: #64748b; margin-top: 4px; }
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        margin-left: 36px;
+        cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--planetun-red);
+    }
+    .checkbox-row label { font-size: 13px; color: #334155; cursor: pointer; }
+    .score-hero {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+        color: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .score-hero .score-label { font-size: 13px; opacity: 0.7; }
+    .score-hero .score-value { font-size: 48px; font-weight: 800; margin-top: 4px; }
+
+    /* Bloco expansível por critério marcado: observação + anexos */
+    .item-detalhes {
+        margin-top: 12px;
+        margin-left: 36px;
+        padding: 16px;
+        background: #fff;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        display: none;
+    }
+    .item-group.checked .item-detalhes { display: block; }
+    .item-detalhes label.field-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #475569;
+        display: block;
+        margin-bottom: 6px;
+    }
+    .item-detalhes textarea { font-size: 13px; }
+    .file-drop {
+        border: 1px dashed var(--planetun-border);
+        border-radius: 8px;
+        padding: 14px;
+        background: #f8fafc;
+        font-size: 13px;
+        color: #64748b;
+    }
+    .file-drop input[type="file"] { padding: 4px 0; background: transparent; border: none; }
+    .helper { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+</style>
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand" style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="/static/logo_icon.png" alt="Planetun" style="height: 32px; border-radius: 4px;">
+                <div>
+                    <div style="color: #fff; font-size: 18px; font-weight: 800;">Planetun</div>
+                    <div style="color: #64748b; font-size: 12px;">Monitoria da Qualidade</div>
+                </div>
+            </div>
+        </div>
+        <nav style="padding: 12px 0; flex: 1;">
+            <a href="/dashboard" class="">📊 Dashboard</a>
+            
+            <a href="/formulario" class="active">📋 Nova Monitoria</a>
+            
+            <a href="/historico" class="">📅 Histórico</a>
+            
+            <a href="/peritos" class="">👥 Peritos</a>
+            <a href="/produtos" class="">📦 Produtos</a>
+            
+        </nav>
+        
+        <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="color: #94a3b8; font-size: 12px;">Logado como</div>
+            <div style="color: #fff; font-size: 14px; font-weight: 600;">Henrique Mazieiro</div>
+            <a href="/logout" style="color: #94a3b8; font-size: 12px; display: inline; padding: 0; margin-top: 4px;">Sair</a>
+        </div>
+        
+    </div>
+
+    <div class="main-content">
+        
+            
+        
+
+        
+<!-- Page Header -->
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">📋 Nova Monitoria</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Preencha os dados, marque as falhas encontradas e anexe evidências quando aplicável.</p>
+    </div>
+</div>
+
+<form method="POST" action="/formulario" enctype="multipart/form-data">
+    <!-- Score Display -->
+    <div class="score-hero">
+        <div class="score-label">NOTA FINAL CALCULADA</div>
+        <div class="score-value" id="scoreValue">100</div>
+    </div>
+
+    <!-- Dados da Monitoria -->
+    <div class="card">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">Dados da Monitoria</h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Perito Avaliado *</label>
+                <select id="colaborador_id" name="colaborador_id" required>
+                    <option value="">Selecione um perito...</option>
+                    
+                    <option value="4">Ana Souza</option>
+                    
+                    <option value="2">Carlos Pereira</option>
+                    
+                    <option value="3">João Silva</option>
+                    
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Cliente *</label>
+                <select id="cliente_id" name="cliente_id" required>
+                    <option value="">Selecione um cliente...</option>
+                    
+                    <option value="3">Bradesco Auto</option>
+                    
+                    <option value="2">Itau Seguros</option>
+                    
+                    <option value="1">Porto Seguro</option>
+                    
+                </select>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Produto</label>
+                <select id="produto_id" name="produto_id">
+                    <option value="">Selecione um produto...</option>
+                    
+                    <option value="3">Inspeção EA</option>
+                    
+                    <option value="4">Roubo / Furto</option>
+                    
+                    <option value="1">Vistoria Prévia</option>
+                    
+                    <option value="2">Vistoria de Sinistro</option>
+                    
+                </select>
+                
+            </div>
+            <div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Avaliador (Supervisor)</label>
+                <input type="text" value="Henrique Mazieiro" disabled style="background: #f1f5f9; color: #64748b;">
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Numero do Processo</label>
+                <input type="text" id="numero_processo" name="numero_processo" placeholder="Ex: 12345">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data da Monitoria *</label>
+                <input type="date" id="data_monitoria" name="data_monitoria" value="2026-04-29" required>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data da Tratativa</label>
+                <input type="date" id="data_tratativa" name="data_tratativa">
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data do Feedback</label>
+                <input type="date" id="data_feedback" name="data_feedback">
+            </div>
+        </div>
+
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Observacoes do Gestor</label>
+            <textarea id="observacoes" name="observacoes" rows="3" placeholder="Descreva aqui..."></textarea>
+        </div>
+    </div>
+
+    <!-- Itens de Avaliacao -->
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; margin-top: 32px;">Itens de Avaliacao</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Marque os itens onde foram identificadas falhas</p>
+
+    
+
+    <!-- GRAVÍSSIMA -->
+    <div class="section-header section-gravissima">
+        🔴 FALHA GRAVÍSSIMA — Se marcado, nota = 0
+    </div>
+    <div class="section-content">
+        
+    <div class="item-group" id="item-group-1">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">1</span>
+            <div style="flex: 1;">
+                <div class="item-title">Apontamentos Inadequados</div>
+                <div class="item-description">Deixou de fazer os devidos apontamentos da análise do risco no laudo...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_1" name="item_1" value="on" data-target="detalhes-1">
+                    <label for="item_1">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-1">
+                    <label class="field-label" for="obs_1">Observação do avaliador</label>
+                    <textarea id="obs_1" name="obs_1" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_1" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_1" name="arquivos_1" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-group" id="item-group-2">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">2</span>
+            <div style="flex: 1;">
+                <div class="item-title">Conferência de Informações e fotos do Veículo</div>
+                <div class="item-description">Não conferiu os dados (modelo, placa e chassi)...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_2" name="item_2" value="on" data-target="detalhes-2">
+                    <label for="item_2">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-2">
+                    <label class="field-label" for="obs_2">Observação do avaliador</label>
+                    <textarea id="obs_2" name="obs_2" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_2" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_2" name="arquivos_2" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-group" id="item-group-3">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">3</span>
+            <div style="flex: 1;">
+                <div class="item-title">Validação de Análise por IA</div>
+                <div class="item-description">Não realizou a conferência dos apontamentos sugeridos pela IA...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_3" name="item_3" value="on" data-target="detalhes-3">
+                    <label for="item_3">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-3">
+                    <label class="field-label" for="obs_3">Observação do avaliador</label>
+                    <textarea id="obs_3" name="obs_3" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_3" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_3" name="arquivos_3" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
+    <!-- GRAVE -->
+    <div class="section-header section-grave">
+        🟠 FALHA GRAVE — Cada uma: -60 pontos
+    </div>
+    <div class="section-content">
+        
+    <div class="item-group" id="item-group-4">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">4</span>
+            <div style="flex: 1;">
+                <div class="item-title">Solicitação Indevida de Fotos</div>
+                <div class="item-description">Solicitou correções ou envio de fotos adicionais de maneira incorreta...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_4" name="item_4" value="on" data-target="detalhes-4">
+                    <label for="item_4">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-4">
+                    <label class="field-label" for="obs_4">Observação do avaliador</label>
+                    <textarea id="obs_4" name="obs_4" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_4" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_4" name="arquivos_4" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-group" id="item-group-5">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">5</span>
+            <div style="flex: 1;">
+                <div class="item-title">Orçamentação Incorreta (aplicável a EA)</div>
+                <div class="item-description">Realizou orçamento incorreto, desconsiderando imagens, peças...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_5" name="item_5" value="on" data-target="detalhes-5">
+                    <label for="item_5">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-5">
+                    <label class="field-label" for="obs_5">Observação do avaliador</label>
+                    <textarea id="obs_5" name="obs_5" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_5" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_5" name="arquivos_5" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
+    <!-- LEVE -->
+    <div class="section-header section-leve">
+        🔵 FALHA LEVE — Cada uma: -40 pontos
+    </div>
+    <div class="section-content">
+        
+    <div class="item-group" id="item-group-6">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">6</span>
+            <div style="flex: 1;">
+                <div class="item-title">Preenchimento Incorreto de Dados</div>
+                <div class="item-description">Erro no preenchimento das informações da vistoria...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_6" name="item_6" value="on" data-target="detalhes-6">
+                    <label for="item_6">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-6">
+                    <label class="field-label" for="obs_6">Observação do avaliador</label>
+                    <textarea id="obs_6" name="obs_6" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_6" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_6" name="arquivos_6" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-group" id="item-group-7">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">7</span>
+            <div style="flex: 1;">
+                <div class="item-title">Falta de Registro de Solicitação de Fotos e/ou observações</div>
+                <div class="item-description">Não houve registro sobre solicitação de fotos adicionais...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_7" name="item_7" value="on" data-target="detalhes-7">
+                    <label for="item_7">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-7">
+                    <label class="field-label" for="obs_7">Observação do avaliador</label>
+                    <textarea id="obs_7" name="obs_7" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_7" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_7" name="arquivos_7" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-group" id="item-group-8">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">8</span>
+            <div style="flex: 1;">
+                <div class="item-title">Relato de Avarias</div>
+                <div class="item-description">Não realizou o relato das avarias conforme as regras...</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_8" name="item_8" value="on" data-target="detalhes-8">
+                    <label for="item_8">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-8">
+                    <label class="field-label" for="obs_8">Observação do avaliador</label>
+                    <textarea id="obs_8" name="obs_8" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_8" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_8" name="arquivos_8" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
+    <!-- Submit -->
+    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+        <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-success" style="padding: 12px 32px; font-size: 15px;">Salvar Monitoria</button>
+    </div>
+</form>
+
+    </div>
+
+    
+<script>
+    function calculateScore() {
+        var score = 100;
+        var gravissima = [1, 2, 3].some(function(i) { return document.getElementById('item_' + i).checked; });
+        if (gravissima) {
+            score = 0;
+        } else {
+            var graveCount = [4, 5].filter(function(i) { return document.getElementById('item_' + i).checked; }).length;
+            score -= graveCount * 60;
+            var leveCount = [6, 7, 8].filter(function(i) { return document.getElementById('item_' + i).checked; }).length;
+            score -= leveCount * 40;
+        }
+        score = Math.max(0, score);
+        document.getElementById('scoreValue').textContent = score;
+
+        for (var i = 1; i <= 8; i++) {
+            var group = document.getElementById('item-group-' + i);
+            if (document.getElementById('item_' + i).checked) {
+                group.classList.add('checked');
+            } else {
+                group.classList.remove('checked');
+            }
+        }
+    }
+
+    document.querySelectorAll('.score-trigger').forEach(function(cb) {
+        cb.addEventListener('change', calculateScore);
+        // Ao desmarcar, limpa observação e arquivos do item correspondente
+        cb.addEventListener('change', function() {
+            if (!cb.checked) {
+                var num = cb.id.replace('item_', '');
+                var obs = document.getElementById('obs_' + num);
+                var files = document.getElementById('arquivos_' + num);
+                if (obs) obs.value = '';
+                if (files) files.value = '';
+            }
+        });
+    });
+
+    // Fallback defensivo: se o backend não preencheu (cache ou render legado),
+    // usa a data local do browser formatada manualmente — evita o bug de
+    // valueAsDate, que interpreta UTC e pode mostrar o dia seguinte no fuso BR.
+    (function() {
+        var input = document.getElementById('data_monitoria');
+        if (input && !input.value) {
+            var d = new Date();
+            var iso = d.getFullYear() + '-' +
+                      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(d.getDate()).padStart(2, '0');
+            input.value = iso;
+        }
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Produtos - Monitoria da Qualidade{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h2 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">📦 Produtos</h2>
+        <p style="color: #64748b; font-size: 14px; margin: 4px 0 0 0;">Cadastre os produtos atendidos pelas monitorias. As regras de avaliação são as mesmas — o produto serve apenas como marcador de análise.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <!-- Card: adicionar manual -->
+    <div class="card">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">➕ Adicionar manualmente</h3>
+        <form method="POST" action="{{ url_for('produtos_novo') }}" style="display: flex; gap: 12px;">
+            <input type="text" name="nome" placeholder="Nome do produto (ex: Vistoria Prévia)" required style="flex: 1;">
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+        <p style="color: #94a3b8; font-size: 12px; margin: 12px 0 0 0;">Nomes duplicados são bloqueados automaticamente.</p>
+    </div>
+
+    <!-- Card: upload em lote -->
+    <div class="card">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">📤 Upload em lote (CSV ou XLSX)</h3>
+        <form method="POST" action="{{ url_for('produtos_upload') }}" enctype="multipart/form-data" style="display: flex; gap: 12px; align-items: center;">
+            <input type="file" name="arquivo" accept=".csv,.xlsx" required style="flex: 1; padding: 6px; background: #f8fafc;">
+            <button type="submit" class="btn btn-secondary">Importar</button>
+        </form>
+        <p style="color: #94a3b8; font-size: 12px; margin: 12px 0 0 0;">Use a 1ª coluna com o nome do produto (1 por linha). Cabeçalho "Produto"/"Nome" é detectado e ignorado. Duplicados são pulados.</p>
+    </div>
+</div>
+
+<!-- Lista -->
+<div class="card">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Produtos cadastrados</h3>
+        <span style="color: #64748b; font-size: 13px;">{{ produtos|length }} no total</span>
+    </div>
+
+    {% if produtos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th style="width: 120px;">Status</th>
+                <th style="width: 120px;">Uso</th>
+                <th style="width: 120px; text-align: right;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in produtos %}
+            <tr>
+                <td style="font-weight: 600; color: #0f172a;">{{ p.nome }}</td>
+                <td>
+                    {% if p.ativo %}
+                    <span class="badge badge-green">Ativo</span>
+                    {% else %}
+                    <span class="badge badge-gray">Inativo</span>
+                    {% endif %}
+                </td>
+                <td style="color: #64748b;">{{ p.uso }} monitoria{% if p.uso != 1 %}s{% endif %}</td>
+                <td style="text-align: right;">
+                    <form method="POST" action="{{ url_for('produtos_toggle', produto_id=p.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm {{ 'btn-secondary' if p.ativo else 'btn-success' }}">
+                            {{ 'Desativar' if p.ativo else 'Reativar' }}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 48px 24px; color: #94a3b8;">
+        <div style="font-size: 48px; margin-bottom: 8px;">📦</div>
+        <div style="font-size: 14px;">Nenhum produto cadastrado ainda. Use os cards acima para começar.</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

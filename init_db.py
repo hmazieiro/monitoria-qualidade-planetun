@@ -33,6 +33,15 @@ def init_db():
     ''')
 
     cursor.execute('''
+    CREATE TABLE produtos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL UNIQUE,
+        ativo BOOLEAN NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
+    cursor.execute('''
     CREATE TABLE monitorias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         data_monitoria DATE NOT NULL,
@@ -41,13 +50,15 @@ def init_db():
         colaborador_id INTEGER NOT NULL,
         avaliador_id INTEGER NOT NULL,
         cliente_id INTEGER NOT NULL,
+        produto_id INTEGER,
         numero_processo TEXT,
         observacoes TEXT,
         nota_final FLOAT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (colaborador_id) REFERENCES usuarios(id),
         FOREIGN KEY (avaliador_id) REFERENCES usuarios(id),
-        FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+        FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+        FOREIGN KEY (produto_id) REFERENCES produtos(id)
     )
     ''')
 
@@ -57,8 +68,38 @@ def init_db():
         monitoria_id INTEGER NOT NULL,
         item_numero INTEGER NOT NULL CHECK(item_numero >= 1 AND item_numero <= 8),
         marcado BOOLEAN NOT NULL DEFAULT 0,
+        observacao TEXT,
         FOREIGN KEY (monitoria_id) REFERENCES monitorias(id) ON DELETE CASCADE,
         UNIQUE(monitoria_id, item_numero)
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE monitoria_anexos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        monitoria_id INTEGER NOT NULL,
+        item_numero INTEGER NOT NULL,
+        nome_original TEXT NOT NULL,
+        nome_arquivo TEXT NOT NULL,
+        tamanho INTEGER,
+        mime_type TEXT,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (monitoria_id) REFERENCES monitorias(id) ON DELETE CASCADE
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE monitoria_replicas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        monitoria_id INTEGER NOT NULL,
+        autor_id INTEGER NOT NULL,
+        autor_tipo TEXT NOT NULL CHECK(autor_tipo IN ('perito', 'supervisor')),
+        decisao TEXT NOT NULL CHECK(decisao IN ('concordo', 'nao_concordo')),
+        justificativa TEXT,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (monitoria_id) REFERENCES monitorias(id) ON DELETE CASCADE,
+        FOREIGN KEY (autor_id) REFERENCES usuarios(id),
+        UNIQUE(monitoria_id, autor_tipo)
     )
     ''')
 

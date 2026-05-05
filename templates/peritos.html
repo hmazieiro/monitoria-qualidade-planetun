@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Peritos - Monitoria da Qualidade{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">👥 Peritos</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Ranking e desempenho individual</p>
+    </div>
+</div>
+
+<div class="card" style="overflow-x: auto;">
+    {% if peritos %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40px;">#</th>
+                <th>Perito</th>
+                <th>E-mail</th>
+                <th style="text-align: right;">Monitorias</th>
+                <th style="text-align: right;">Nota Média</th>
+                <th>Última avaliação</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in peritos %}
+            <tr>
+                <td style="color: #94a3b8; font-weight: 700;">{{ loop.index }}</td>
+                <td style="font-weight: 600; color: #0f172a;">{{ p.nome }}</td>
+                <td style="color: #64748b; font-size: 13px;">{{ p.email }}</td>
+                <td style="text-align: right; color: #334155;">{{ p.total_monitorias }}</td>
+                <td style="text-align: right; font-weight: 700; color: {% if p.nota_media >= 90 %}#10b981{% elif p.nota_media >= 60 %}#f59e0b{% elif p.total_monitorias == 0 %}#94a3b8{% else %}#ef4444{% endif %};">
+                    {% if p.total_monitorias == 0 %}—{% else %}{{ '%.1f'|format(p.nota_media) }}{% endif %}
+                </td>
+                <td style="color: #64748b;">{{ p.ultima_data or '—' }}</td>
+                <td>
+                    {% if not p.ativo %}
+                    <span class="badge badge-gray">Inativo</span>
+                    {% elif p.total_monitorias == 0 %}
+                    <span class="badge badge-blue">Sem dados</span>
+                    {% elif p.nota_media >= 90 %}
+                    <span class="badge badge-green">Excelente</span>
+                    {% elif p.nota_media >= 60 %}
+                    <span class="badge badge-yellow">Atenção</span>
+                    {% else %}
+                    <span class="badge badge-red">Crítico</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 48px; color: #94a3b8;">
+        <div style="font-size: 48px; margin-bottom: 8px;">👥</div>
+        <div style="font-size: 14px;">Nenhum perito cadastrado ainda.</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

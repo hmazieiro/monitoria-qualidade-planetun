@@ -4,212 +4,380 @@
 
 {% block extra_css %}
 <style>
-    .detalhe-header {
-        background: linear-gradient(135deg, #00266d 0%, #007dfe 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .detalhe-header h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-
-    .nota-display {
-        font-size: 3rem;
-        font-weight: 700;
-        min-width: 110px;
-        text-align: center;
-        padding: 0.5rem 1.25rem;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.15);
-    }
-
-    .nota-100 { background: #28a745; }
-    .nota-60  { background: #ff850a; }
-    .nota-40  { background: #ffc107; color: #333; }
-    .nota-0   { background: #e74c3c; }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.25rem;
-        padding: 1.5rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-bottom: 2rem;
-    }
-
-    @media (max-width: 768px) {
-        .info-grid { grid-template-columns: 1fr; }
-    }
-
-    .info-item .label {
-        font-size: 0.8rem;
-        color: #6c757d;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 0.25rem;
-    }
-
-    .info-item .value {
-        font-size: 1.05rem;
-        color: #333;
-        font-weight: 500;
-    }
-
-    .itens-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .itens-card h5 {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 1rem;
-    }
-
+    /* Item card */
     .item-row {
         display: flex;
         align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.9rem 1rem;
-        border-radius: 6px;
-        margin-bottom: 0.5rem;
-        border-left: 4px solid #dee2e6;
-        background: #f8f9fa;
-    }
-
-    .item-row.marcado { background: #fff3cd; border-left-color: #dc3545; }
-    .item-row.marcado .check-icon { color: #dc3545; }
-    .item-row .check-icon {
-        font-size: 1.25rem;
-        color: #adb5bd;
-        flex-shrink: 0;
-        width: 22px;
-    }
-
-    .item-row .item-nome { font-weight: 600; color: #333; }
-    .item-row .item-desc { font-size: 0.85rem; color: #666; margin-top: 0.2rem; }
-    .item-row .item-cat  {
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 2px 8px;
+        gap: 14px;
+        padding: 14px 16px;
         border-radius: 10px;
-        text-transform: uppercase;
-        margin-left: 0.5rem;
-        vertical-align: middle;
+        margin-bottom: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
     }
-    .cat-GRAVÍSSIMA { background: #f8d7da; color: #842029; }
-    .cat-GRAVE      { background: #ffe5cc; color: #80390a; }
-    .cat-LEVE       { background: #cfe2ff; color: #084298; }
+    .item-row.marcado { border-color: #fecaca; background: #fff7f6; }
 
-    .observacoes-box {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
+    /* Número dentro de círculo colorido pela categoria quando marcado */
+    .item-num {
+        flex-shrink: 0;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: 700;
+        background: #f1f5f9; color: #94a3b8;
+        border: 2px solid #e2e8f0;
     }
-    .observacoes-box h5 { font-weight: 600; color: #333; margin-bottom: 0.75rem; }
-    .observacoes-box p { color: #555; white-space: pre-wrap; margin: 0; }
+    .item-row.marcado.cat-GRAVISSIMA  .item-num,
+    .item-row.marcado.cat-GRAVÍSSIMA .item-num { background: var(--planetun-red);    color: #fff; border-color: var(--planetun-red); }
+    .item-row.marcado.cat-GRAVE      .item-num { background: var(--planetun-orange); color: #fff; border-color: var(--planetun-orange); }
+    .item-row.marcado.cat-LEVE       .item-num { background: var(--planetun-blue);   color: #fff; border-color: var(--planetun-blue); }
+
+    .item-nome { font-weight: 600; color: #0f172a; font-size: 14px; }
+    .item-desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .item-cat {
+        font-size: 11px; font-weight: 600; padding: 2px 8px;
+        border-radius: 999px; text-transform: uppercase; margin-left: 8px;
+        white-space: nowrap;
+    }
+    .cat-GRAVISSIMA, .cat-GRAVÍSSIMA { background: #fee2e2; color: #991b1b; }
+    .cat-GRAVE { background: #fef3c7; color: #92400e; }
+    .cat-LEVE  { background: #dbeafe; color: #1e40af; }
+
+    .item-status-ok { font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .item-status-falha { font-size: 12px; color: var(--planetun-red); font-weight: 700; }
+
+    /* Bloco de detalhes do item marcado */
+    .item-detalhe {
+        margin-top: 12px;
+        padding: 12px 14px;
+        background: #fafafa;
+        border-left: 3px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 13px;
+    }
+    .item-detalhe .label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.4px; color: #64748b; margin-bottom: 4px;
+    }
+    .item-detalhe p {
+        margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;
+    }
+    .anexos-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+    .anexo-link {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; background: #fff;
+        border: 1px solid #e2e8f0; border-radius: 6px;
+        text-decoration: none; color: #334155; font-size: 13px;
+    }
+    .anexo-link:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .anexo-icon {
+        width: 28px; height: 28px; border-radius: 6px;
+        background: #e0f2fe; color: #0369a1;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0;
+    }
+    .anexo-meta { color: #94a3b8; font-size: 12px; margin-left: auto; }
+
+    /* Bloco de réplica */
+    .replica-card {
+        background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+        padding: 24px; margin-bottom: 20px;
+    }
+    .replica-pendente { border-color: #fbbf24; background: #fffbeb; }
+    .replica-feita    { border-color: #10b981; background: #ecfdf5; }
+    .replica-discordo { border-color: #ef4444; background: #fef2f2; }
+    .replica-title {
+        font-size: 14px; font-weight: 700; color: #0f172a;
+        margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .decisao-row { display: flex; gap: 12px; margin: 14px 0; }
+    .btn-decisao {
+        flex: 1; padding: 14px; border-radius: 10px; cursor: pointer;
+        font-size: 14px; font-weight: 600; text-align: center;
+        border: 2px solid #e2e8f0; background: #fff; color: #334155;
+        transition: all 0.15s;
+    }
+    .btn-decisao:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .btn-decisao.sel-concordo {
+        border-color: var(--planetun-green); background: #d1fae5; color: #065f46;
+    }
+    .btn-decisao.sel-discordo {
+        border-color: var(--planetun-red); background: #fee2e2; color: #991b1b;
+    }
+    .replica-justificativa-wrap { display: none; }
+    .replica-justificativa-wrap.show { display: block; }
 </style>
 {% endblock %}
 
 {% block content %}
 {% if monitoria is none %}
-<div class="alert alert-warning">
+<div class="flash-warning">
     Monitoria não encontrada.
-    <a href="/dashboard" class="alert-link">Voltar ao dashboard</a>
+    <a href="/dashboard" style="color: #92400e; font-weight: 600;">Voltar ao dashboard</a>
 </div>
 {% else %}
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item active">Monitoria #{{ monitoria.id }}</li>
-    </ol>
-</nav>
+<!-- Breadcrumb -->
+<div style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+    <a href="/historico" style="color: var(--planetun-blue); text-decoration: none;">Histórico</a>
+    <span style="margin: 0 8px;">/</span>
+    <span>Monitoria #{{ monitoria.id }}</span>
+</div>
 
-{% set nota_class = 'nota-100' if monitoria.nota_final == 100 else ('nota-0' if monitoria.nota_final == 0 else ('nota-40' if monitoria.nota_final < 60 else 'nota-60')) %}
+<!-- Header Hero -->
+{% set nota = monitoria.nota_final|int %}
+{% set nota_color = '#10b981' if nota == 100 else ('#ef4444' if nota == 0 else ('#f59e0b' if nota < 60 else '#3b82f6')) %}
 
-<div class="detalhe-header">
+<div class="card card-hero" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
     <div>
-        <h1>Monitoria de {{ monitoria.colaborador_nome }}</h1>
-        <div style="opacity:0.85; font-size:0.95rem; margin-top:0.3rem;">
-            Processo {{ monitoria.numero_processo or '—' }}
+        <div style="font-size: 13px; opacity: 0.7;">MONITORIA #{{ monitoria.id }}</div>
+        <div style="font-size: 22px; font-weight: 700; margin-top: 4px;">{{ monitoria.colaborador_nome }}</div>
+        <div style="font-size: 13px; opacity: 0.7; margin-top: 4px;">Processo {{ monitoria.numero_processo or '—' }}</div>
+    </div>
+    <div style="background: {{ nota_color }}; padding: 12px 24px; border-radius: 12px; text-align: center; min-width: 100px;">
+        <div style="font-size: 36px; font-weight: 800;">{{ nota }}</div>
+        <div style="font-size: 11px; opacity: 0.8;">NOTA FINAL</div>
+    </div>
+</div>
+
+<!-- Info Grid -->
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Perito Avaliado</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">{{ monitoria.colaborador_nome }}</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Supervisor</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">{{ monitoria.avaliador_nome }}</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Cliente</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">{{ monitoria.cliente_nome }}</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Monitoria</div>
+            <div style="font-size: 14px; color: #334155;">{{ monitoria.data_monitoria }}</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Tratativa</div>
+            <div style="font-size: 14px; color: #334155;">{{ monitoria.data_tratativa or '—' }}</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data do Feedback</div>
+            <div style="font-size: 14px; color: #334155;">{{ monitoria.data_feedback or '—' }}</div>
         </div>
     </div>
-    <div class="nota-display {{ nota_class }}">
-        {{ monitoria.nota_final|int }}
-    </div>
 </div>
 
-<div class="info-grid">
-    <div class="info-item">
-        <div class="label">Perito avaliado</div>
-        <div class="value">{{ monitoria.colaborador_nome }}</div>
-    </div>
-    <div class="info-item">
-        <div class="label">Supervisor avaliador</div>
-        <div class="value">{{ monitoria.avaliador_nome }}</div>
-    </div>
-    <div class="info-item">
-        <div class="label">Cliente</div>
-        <div class="value">{{ monitoria.cliente_nome }}</div>
-    </div>
-    <div class="info-item">
-        <div class="label">Data da monitoria</div>
-        <div class="value">{{ monitoria.data_monitoria }}</div>
-    </div>
-    <div class="info-item">
-        <div class="label">Data da tratativa</div>
-        <div class="value">{{ monitoria.data_tratativa or '—' }}</div>
-    </div>
-    <div class="info-item">
-        <div class="label">Data do feedback</div>
-        <div class="value">{{ monitoria.data_feedback or '—' }}</div>
-    </div>
-</div>
-
-<div class="itens-card">
-    <h5>Itens avaliados</h5>
+<!-- Itens Avaliados -->
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Itens Avaliados</h3>
+    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Critérios marcados em vermelho/laranja/azul indicam falhas. Os demais ficam em cinza.</p>
     {% for num, item in items.items() %}
     {% set foi_marcado = marcados_map.get(num, False) %}
-    <div class="item-row {{ 'marcado' if foi_marcado else '' }}">
-        <div class="check-icon">{{ '●' if foi_marcado else '○' }}</div>
-        <div style="flex:1;">
-            <div>
-                <span class="item-nome">{{ num }}. {{ item.nome }}</span>
+    {% set obs = obs_map.get(num, '') %}
+    {% set anexos = anexos_por_item.get(num, []) %}
+    <div class="item-row {{ 'marcado' if foi_marcado else '' }} cat-{{ item.categoria }}">
+        <div class="item-num">{{ num }}</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <span class="item-nome">{{ item.nome }}</span>
                 <span class="item-cat cat-{{ item.categoria }}">{{ item.categoria }}</span>
+                {% if foi_marcado %}
+                <span class="item-status-falha" style="margin-left: auto;">● Falha apontada</span>
+                {% else %}
+                <span class="item-status-ok" style="margin-left: auto;">○ Sem falha</span>
+                {% endif %}
             </div>
             <div class="item-desc">{{ item.descricao }}</div>
+
+            {% if foi_marcado and (obs or anexos) %}
+            <div class="item-detalhe">
+                {% if obs %}
+                <div class="label">Observação do supervisor</div>
+                <p>{{ obs }}</p>
+                {% endif %}
+                {% if anexos %}
+                <div class="label" style="margin-top: {{ '12px' if obs else '0' }};">Evidências anexadas</div>
+                <div class="anexos-list">
+                    {% for a in anexos %}
+                    <a class="anexo-link" href="{{ url_for('servir_anexo', monitoria_id=monitoria.id, filename=a.nome_arquivo) }}" target="_blank" rel="noopener">
+                        <span class="anexo-icon">📎</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ a.nome_original }}</span>
+                        <span class="anexo-meta">{{ (a.tamanho / 1024)|round|int }} KB</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
 </div>
 
+<!-- Observações gerais do gestor -->
 {% if monitoria.observacoes %}
-<div class="observacoes-box">
-    <h5>Observações do gestor</h5>
-    <p>{{ monitoria.observacoes }}</p>
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">📝 Observações gerais do gestor</h3>
+    <p style="font-size: 14px; color: #334155; white-space: pre-wrap; margin: 0;">{{ monitoria.observacoes }}</p>
 </div>
 {% endif %}
 
-<a href="/dashboard" class="btn btn-outline-primary">← Voltar ao dashboard</a>
+<!-- ============================================================== -->
+<!-- BLOCO DE RÉPLICA — perito e supervisor                         -->
+<!-- ============================================================== -->
+
+<!-- 1) Réplica do perito (já enviada) -->
+{% if replica_perito %}
+<div class="replica-card {{ 'replica-discordo' if replica_perito.decisao == 'nao_concordo' else 'replica-feita' }}">
+    <div class="replica-title">
+        {% if replica_perito.decisao == 'concordo' %}
+        ✅ Manifestação do perito — <span style="color: #065f46;">CONCORDA</span>
+        {% else %}
+        ⚠️ Manifestação do perito — <span style="color: #991b1b;">NÃO CONCORDA</span>
+        {% endif %}
+    </div>
+    <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+        {{ replica_perito.autor_nome }} · {{ replica_perito.criado_em }}
+    </div>
+    {% if replica_perito.justificativa %}
+    <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin-top: 12px; margin-bottom: 4px;">Justificativa</div>
+    <p style="margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;">{{ replica_perito.justificativa }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- 2) Formulário de réplica do PERITO (se ele ainda não respondeu) -->
+{% if pode_replicar_perito %}
+<div class="replica-card replica-pendente">
+    <div class="replica-title">✍️ Sua manifestação sobre esta avaliação</div>
+    <p style="font-size: 13px; color: #475569; margin: 0 0 8px 0;">
+        Você pode <strong>concordar</strong> com a avaliação ou <strong>contestá-la</strong>.
+        A manifestação só pode ser enviada <strong>uma vez</strong>.
+    </p>
+    <form method="POST" action="{{ url_for('monitoria_replica', monitoria_id=monitoria.id) }}" id="form-replica-perito">
+        <div class="decisao-row">
+            <label class="btn-decisao" id="opt-concordo">
+                <input type="radio" name="decisao" value="concordo" style="display: none;" onchange="toggleJust(false)">
+                ✓ Concordo com a avaliação
+            </label>
+            <label class="btn-decisao" id="opt-discordo">
+                <input type="radio" name="decisao" value="nao_concordo" style="display: none;" onchange="toggleJust(true)">
+                ✕ Não concordo
+            </label>
+        </div>
+        <div class="replica-justificativa-wrap" id="just-wrap">
+            <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; display: block; margin-bottom: 6px;">Justificativa <span style="color: var(--planetun-red);">*</span></label>
+            <textarea name="justificativa" rows="4" placeholder="Descreva por que você não concorda com esta avaliação. Seja específico — mencione o item, contexto e motivo." style="width: 100%;"></textarea>
+            <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Obrigatório quando você marca "Não concordo".</div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button type="submit" class="btn btn-primary" id="btn-enviar-replica" disabled>Enviar manifestação</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var formRep = document.getElementById('form-replica-perito');
+    var btnEnv = document.getElementById('btn-enviar-replica');
+    var optC = document.getElementById('opt-concordo');
+    var optD = document.getElementById('opt-discordo');
+    var justWrap = document.getElementById('just-wrap');
+
+    function toggleJust(showJust) {
+        // Visual de seleção
+        optC.classList.remove('sel-concordo');
+        optD.classList.remove('sel-discordo');
+        if (showJust) {
+            optD.classList.add('sel-discordo');
+            justWrap.classList.add('show');
+        } else {
+            optC.classList.add('sel-concordo');
+            justWrap.classList.remove('show');
+        }
+        btnEnv.disabled = false;
+    }
+</script>
+{% elif eh_perito_avaliado and replica_perito %}
+<!-- Perito já respondeu — exibe agradecimento -->
+<div style="text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px;">
+    Sua manifestação foi registrada {% if not replica_supervisor %}e o supervisor foi notificado.{% else %}e respondida pelo supervisor.{% endif %}
+</div>
+{% endif %}
+
+<!-- 3) Resposta do supervisor (já enviada) -->
+{% if replica_supervisor %}
+<div class="replica-card {{ 'replica-discordo' if replica_supervisor.decisao == 'nao_concordo' else 'replica-feita' }}">
+    <div class="replica-title">
+        {% if replica_supervisor.decisao == 'concordo' %}
+        ✅ Resposta do supervisor — <span style="color: #065f46;">ACOLHE A MANIFESTAÇÃO DO PERITO</span>
+        {% else %}
+        🛡️ Resposta do supervisor — <span style="color: #991b1b;">MANTÉM A AVALIAÇÃO ORIGINAL</span>
+        {% endif %}
+    </div>
+    <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+        {{ replica_supervisor.autor_nome }} · {{ replica_supervisor.criado_em }}
+    </div>
+    {% if replica_supervisor.justificativa %}
+    <div class="label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin-top: 12px; margin-bottom: 4px;">Justificativa</div>
+    <p style="margin: 0; color: #334155; white-space: pre-wrap; line-height: 1.5;">{{ replica_supervisor.justificativa }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- 4) Formulário do SUPERVISOR (se perito já replicou e supervisor ainda não) -->
+{% if pode_replicar_supervisor %}
+<div class="replica-card replica-pendente">
+    <div class="replica-title">📝 Sua resposta como supervisor</div>
+    <p style="font-size: 13px; color: #475569; margin: 0 0 8px 0;">
+        O perito apresentou manifestação sobre esta avaliação. Sua resposta também pode ser enviada <strong>uma única vez</strong>.
+    </p>
+    <form method="POST" action="{{ url_for('monitoria_replica', monitoria_id=monitoria.id) }}" id="form-replica-sup">
+        <div class="decisao-row">
+            <label class="btn-decisao" id="sup-opt-concordo">
+                <input type="radio" name="decisao" value="concordo" style="display: none;" onchange="toggleJustSup(false)">
+                ✓ Acolho — ajustar avaliação
+            </label>
+            <label class="btn-decisao" id="sup-opt-discordo">
+                <input type="radio" name="decisao" value="nao_concordo" style="display: none;" onchange="toggleJustSup(true)">
+                🛡️ Mantenho a avaliação
+            </label>
+        </div>
+        <div class="replica-justificativa-wrap" id="sup-just-wrap">
+            <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; display: block; margin-bottom: 6px;">Justificativa <span style="color: var(--planetun-red);">*</span></label>
+            <textarea name="justificativa" rows="4" placeholder="Explique o porquê de manter (ou ajustar) a avaliação original." style="width: 100%;"></textarea>
+            <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Obrigatório quando você marca "Mantenho a avaliação".</div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button type="submit" class="btn btn-primary" id="sup-btn-enviar" disabled>Enviar resposta</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var supBtn = document.getElementById('sup-btn-enviar');
+    var supC = document.getElementById('sup-opt-concordo');
+    var supD = document.getElementById('sup-opt-discordo');
+    var supJust = document.getElementById('sup-just-wrap');
+    function toggleJustSup(showJust) {
+        supC.classList.remove('sel-concordo');
+        supD.classList.remove('sel-discordo');
+        if (showJust) {
+            supD.classList.add('sel-discordo');
+            supJust.classList.add('show');
+        } else {
+            supC.classList.add('sel-concordo');
+            supJust.classList.remove('show');
+        }
+        supBtn.disabled = false;
+    }
+</script>
+{% endif %}
+
+<!-- Back -->
+<a href="/historico" class="btn btn-secondary" style="margin-top: 8px;">← Voltar ao histórico</a>
 
 {% endif %}
 {% endblock %}

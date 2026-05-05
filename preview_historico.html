@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - Monitoria da Qualidade</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --planetun-dark: #0f172a;
+            --planetun-blue: #2563eb;
+            --planetun-green: #10b981;
+            --planetun-orange: #f59e0b;
+            --planetun-red: #ef4444;
+            --planetun-gray: #64748b;
+            --planetun-light: #f8fafc;
+            --planetun-border: #e2e8f0;
+        }
+        body { background: var(--planetun-light); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #334155; margin: 0; }
+        /* SIDEBAR */
+        .sidebar { background: var(--planetun-dark); min-height: 100vh; width: 240px; position: fixed; top: 0; left: 0; z-index: 40; display: flex; flex-direction: column; }
+        .sidebar a { color: #94a3b8; display: block; padding: 10px 20px; font-size: 14px; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); border-left: 3px solid var(--planetun-blue); }
+        .main-content { margin-left: 240px; padding: 32px; min-height: 100vh; }
+        /* CARDS */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+        .card-hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); color: #fff; }
+        /* BADGES */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        /* BUTTONS */
+        .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-block; text-decoration: none; }
+        .btn-primary { background: var(--planetun-blue); color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-success { background: var(--planetun-green); color: #fff; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--planetun-red); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        /* FORMS */
+        input, select, textarea {
+            border: 1px solid var(--planetun-border); border-radius: 8px; padding: 8px 12px;
+            font-size: 14px; width: 100%; transition: border 0.2s; box-sizing: border-box;
+            font-family: inherit; color: #334155; background: #fff;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--planetun-blue); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover td { background: #f8fafc; }
+        /* STAT CARDS */
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 36px; font-weight: 800; color: var(--planetun-dark); }
+        .stat-card .label { font-size: 13px; color: var(--planetun-gray); margin-top: 4px; }
+        /* FLASH MESSAGES */
+        .flash-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-error { background: #fee2e2; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-warning { background: #fef3c7; color: #92400e; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; display: flex; flex-direction: row; overflow-x: auto; }
+            .sidebar a { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .sidebar a.active { border-left: none; border-bottom: 3px solid var(--planetun-blue); }
+            .sidebar .sidebar-brand { display: none; }
+            .main-content { margin-left: 0; padding: 16px; }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand" style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="/static/logo_icon.png" alt="Planetun" style="height: 32px; border-radius: 4px;">
+                <div>
+                    <div style="color: #fff; font-size: 18px; font-weight: 800;">Planetun</div>
+                    <div style="color: #64748b; font-size: 12px;">Monitoria da Qualidade</div>
+                </div>
+            </div>
+        </div>
+        <nav style="padding: 12px 0; flex: 1;">
+            <a href="/dashboard" class="">📊 Dashboard</a>
+            
+            <a href="/formulario" class="">📋 Nova Monitoria</a>
+            
+            <a href="/historico" class="active">📅 Histórico</a>
+            
+            <a href="/peritos" class="">👥 Peritos</a>
+            <a href="/produtos" class="">📦 Produtos</a>
+            
+        </nav>
+        
+        <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="color: #94a3b8; font-size: 12px;">Logado como</div>
+            <div style="color: #fff; font-size: 14px; font-weight: 600;">Henrique Mazieiro</div>
+            <a href="/logout" style="color: #94a3b8; font-size: 12px; display: inline; padding: 0; margin-top: 4px;">Sair</a>
+        </div>
+        
+    </div>
+
+    <div class="main-content">
+        
+            
+        
+
+        
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">📅 Histórico de Monitorias</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Todas as avaliações realizadas — clique em uma linha para ver o detalhe completo</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card" style="margin-bottom: 20px;">
+    <form method="GET" action="/historico" style="display: grid; grid-template-columns: repeat(5, 1fr) auto; gap: 16px; align-items: flex-end;">
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Mês</label>
+            <select name="mes">
+                <option value="">Todos</option>
+                
+                <option value="1" >Janeiro</option>
+                
+                <option value="2" >Fevereiro</option>
+                
+                <option value="3" >Março</option>
+                
+                <option value="4" >Abril</option>
+                
+                <option value="5" >Maio</option>
+                
+                <option value="6" >Junho</option>
+                
+                <option value="7" >Julho</option>
+                
+                <option value="8" >Agosto</option>
+                
+                <option value="9" >Setembro</option>
+                
+                <option value="10" >Outubro</option>
+                
+                <option value="11" >Novembro</option>
+                
+                <option value="12" >Dezembro</option>
+                
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Ano</label>
+            <select name="ano">
+                <option value="">Todos</option>
+                <option value="2024" >2024</option>
+                <option value="2025" >2025</option>
+                <option value="2026" >2026</option>
+            </select>
+        </div>
+        
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Perito</label>
+            <select name="perito_id">
+                <option value="">Todos os peritos</option>
+                
+                <option value="4" >Ana Souza</option>
+                
+                <option value="2" >Carlos Pereira</option>
+                
+                <option value="3" >João Silva</option>
+                
+            </select>
+        </div>
+        
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Cliente</label>
+            <select name="cliente_id">
+                <option value="">Todos os clientes</option>
+                
+                <option value="3" >Bradesco Auto</option>
+                
+                <option value="2" >Itau Seguros</option>
+                
+                <option value="1" >Porto Seguro</option>
+                
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Produto</label>
+            <select name="produto_id">
+                <option value="">Todos os produtos</option>
+                
+                <option value="3" >Inspeção EA</option>
+                
+                <option value="4" >Roubo / Furto</option>
+                
+                <option value="1" >Vistoria Prévia</option>
+                
+                <option value="2" >Vistoria de Sinistro</option>
+                
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="height: fit-content;">Filtrar</button>
+    </form>
+</div>
+
+<!-- Tabela -->
+<div class="card" style="overflow-x: auto;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">15 monitorias</h3>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Perito</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Avaliador</th>
+                <th>Processo</th>
+                <th style="text-align: right;">Nota</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/999'">
+                <td style="white-space: nowrap;">2026-04-25</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td>Porto Seguro</td>
+                <td>Vistoria Prévia</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">2026-04-00342</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">0</td>
+                <td>
+                    
+                    <span class="badge badge-red">Gravíssima</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/998'">
+                <td style="white-space: nowrap;">2026-04-22</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td>Itau Seguros</td>
+                <td>Vistoria de Sinistro</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">2026-04-00298</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">60</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/997'">
+                <td style="white-space: nowrap;">2026-04-18</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td>Porto Seguro</td>
+                <td>Vistoria Prévia</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">2026-04-00256</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">20</td>
+                <td>
+                    
+                    <span class="badge badge-red">Não conforme</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/12'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td>Bradesco Auto</td>
+                <td>Roubo / Furto</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">45</td>
+                <td>
+                    
+                    <span class="badge badge-red">Não conforme</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/11'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td>Itau Seguros</td>
+                <td>Inspeção EA</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">50</td>
+                <td>
+                    
+                    <span class="badge badge-red">Não conforme</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/10'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td>Porto Seguro</td>
+                <td>Vistoria de Sinistro</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">55</td>
+                <td>
+                    
+                    <span class="badge badge-red">Não conforme</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/9'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td>Bradesco Auto</td>
+                <td>Vistoria Prévia</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">60</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/8'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td>Itau Seguros</td>
+                <td>Roubo / Furto</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">65</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/7'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td>Porto Seguro</td>
+                <td>Inspeção EA</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">70</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/6'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td>Bradesco Auto</td>
+                <td>Vistoria de Sinistro</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">75</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/5'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td>Itau Seguros</td>
+                <td>Vistoria Prévia</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">80</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/4'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td>Porto Seguro</td>
+                <td>Roubo / Furto</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">85</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/3'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td>Bradesco Auto</td>
+                <td>Inspeção EA</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">90</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/2'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td>Itau Seguros</td>
+                <td>Vistoria de Sinistro</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">95</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr style="cursor: pointer;" onclick="window.location='/monitoria/1'">
+                <td style="white-space: nowrap;">2026-04-15</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td>Porto Seguro</td>
+                <td>Vistoria Prévia</td>
+                <td style="color: #64748b;">Henrique Mazieiro</td>
+                <td style="color: #64748b; font-family: monospace; font-size: 13px;">—</td>
+                <td style="text-align: right; font-weight: 700; color: #10b981;">100</td>
+                <td>
+                    
+                    <span class="badge badge-green">Conforme</span>
+                    
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+    
+</div>
+
+    </div>
+
+    
+</body>
+</html>

@@ -2,3 +2,20 @@ __pycache__/
 *.pyc
 *.db
 .env
+
+# venv
+venv/
+.venv/
+
+# macOS / iCloud / Dropbox sync junk
+.DS_Store
+Icon?
+Icon\r
+"Icon\r"
+*\ 2
+*\ 2/
+.git\ 2/
+templates\ 2/
+
+# uploads (efêmero, gerado em runtime)
+uploads/

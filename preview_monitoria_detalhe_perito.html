@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoria #999 - Monitoria da Qualidade</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --planetun-dark: #0f172a;
+            --planetun-blue: #2563eb;
+            --planetun-green: #10b981;
+            --planetun-orange: #f59e0b;
+            --planetun-red: #ef4444;
+            --planetun-gray: #64748b;
+            --planetun-light: #f8fafc;
+            --planetun-border: #e2e8f0;
+        }
+        body { background: var(--planetun-light); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #334155; margin: 0; }
+        /* SIDEBAR */
+        .sidebar { background: var(--planetun-dark); min-height: 100vh; width: 240px; position: fixed; top: 0; left: 0; z-index: 40; display: flex; flex-direction: column; }
+        .sidebar a { color: #94a3b8; display: block; padding: 10px 20px; font-size: 14px; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); border-left: 3px solid var(--planetun-blue); }
+        .main-content { margin-left: 240px; padding: 32px; min-height: 100vh; }
+        /* CARDS */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+        .card-hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); color: #fff; }
+        /* BADGES */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        /* BUTTONS */
+        .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-block; text-decoration: none; }
+        .btn-primary { background: var(--planetun-blue); color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-success { background: var(--planetun-green); color: #fff; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--planetun-red); color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        /* FORMS */
+        input, select, textarea {
+            border: 1px solid var(--planetun-border); border-radius: 8px; padding: 8px 12px;
+            font-size: 14px; width: 100%; transition: border 0.2s; box-sizing: border-box;
+            font-family: inherit; color: #334155; background: #fff;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--planetun-blue); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover td { background: #f8fafc; }
+        /* STAT CARDS */
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 36px; font-weight: 800; color: var(--planetun-dark); }
+        .stat-card .label { font-size: 13px; color: var(--planetun-gray); margin-top: 4px; }
+        /* FLASH MESSAGES */
+        .flash-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-error { background: #fee2e2; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-warning { background: #fef3c7; color: #92400e; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; display: flex; flex-direction: row; overflow-x: auto; }
+            .sidebar a { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .sidebar a.active { border-left: none; border-bottom: 3px solid var(--planetun-blue); }
+            .sidebar .sidebar-brand { display: none; }
+            .main-content { margin-left: 0; padding: 16px; }
+        }
+        
+<style>
+    .item-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 4px solid var(--planetun-border);
+        background: #f8fafc;
+    }
+    .item-row.marcado { background: #fef3c7; border-left-color: var(--planetun-red); }
+    .item-row .check-icon { font-size: 18px; color: #94a3b8; flex-shrink: 0; }
+    .item-row.marcado .check-icon { color: var(--planetun-red); }
+    .item-nome { font-weight: 600; color: #0f172a; font-size: 14px; }
+    .item-desc { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .item-cat {
+        font-size: 11px; font-weight: 600; padding: 2px 8px;
+        border-radius: 999px; text-transform: uppercase; margin-left: 8px;
+    }
+    .cat-GRAVISSIMA, .cat-GRAVÍSSIMA { background: #fee2e2; color: #991b1b; }
+    .cat-GRAVE { background: #fef3c7; color: #92400e; }
+    .cat-LEVE { background: #dbeafe; color: #1e40af; }
+</style>
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand" style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="static/logo_icon.png" alt="Planetun" style="height: 32px; border-radius: 4px;">
+                <div>
+                    <div style="color: #fff; font-size: 18px; font-weight: 800;">Planetun</div>
+                    <div style="color: #64748b; font-size: 12px;">Monitoria da Qualidade</div>
+                </div>
+            </div>
+        </div>
+        <nav style="padding: 12px 0; flex: 1;">
+            <a href="/dashboard" class="">📊 Dashboard</a>
+            
+            <a href="/historico" class="">📅 Histórico</a>
+            
+        </nav>
+        
+        <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="color: #94a3b8; font-size: 12px;">Logado como</div>
+            <div style="color: #fff; font-size: 14px; font-weight: 600;">Carlos Pereira</div>
+            <a href="/logout" style="color: #94a3b8; font-size: 12px; display: inline; padding: 0; margin-top: 4px;">Sair</a>
+        </div>
+        
+    </div>
+
+    <div class="main-content">
+        
+            
+        
+
+        
+
+
+<!-- Breadcrumb -->
+<div style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+    <a href="/dashboard" style="color: var(--planetun-blue); text-decoration: none;">Dashboard</a>
+    <span style="margin: 0 8px;">/</span>
+    <span>Monitoria #999</span>
+</div>
+
+<!-- Header Hero -->
+
+
+
+<div class="card card-hero" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <div style="font-size: 13px; opacity: 0.7;">MONITORIA #999</div>
+        <div style="font-size: 22px; font-weight: 700; margin-top: 4px;">Carlos Pereira</div>
+        <div style="font-size: 13px; opacity: 0.7; margin-top: 4px;">Processo 2026-04-00342</div>
+    </div>
+    <div style="background: #ef4444; padding: 12px 24px; border-radius: 12px; text-align: center; min-width: 100px;">
+        <div style="font-size: 36px; font-weight: 800;">0</div>
+        <div style="font-size: 11px; opacity: 0.8;">NOTA FINAL</div>
+    </div>
+</div>
+
+<!-- Info Grid -->
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Perito Avaliado</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Carlos Pereira</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Supervisor</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Henrique Mazieiro</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Cliente</div>
+            <div style="font-size: 14px; font-weight: 600; color: #0f172a;">Porto Seguro</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Monitoria</div>
+            <div style="font-size: 14px; color: #334155;">2026-04-25</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data da Tratativa</div>
+            <div style="font-size: 14px; color: #334155;">2026-04-26</div>
+        </div>
+        <div>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Data do Feedback</div>
+            <div style="font-size: 14px; color: #334155;">—</div>
+        </div>
+    </div>
+</div>
+
+<!-- Itens Avaliados -->
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Itens Avaliados</h3>
+    
+    
+    <div class="item-row marcado">
+        <div class="check-icon">●</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">1. Apontamentos Inadequados</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+            </div>
+            <div class="item-desc">Deixou de fazer os devidos apontamentos da análise do risco no laudo...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row ">
+        <div class="check-icon">○</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">2. Conferência de Informações e fotos do Veículo</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+            </div>
+            <div class="item-desc">Não conferiu os dados (modelo, placa e chassi)...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row ">
+        <div class="check-icon">○</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">3. Validação de Análise por IA</span>
+                <span class="item-cat cat-GRAVÍSSIMA">GRAVÍSSIMA</span>
+            </div>
+            <div class="item-desc">Não realizou a conferência dos apontamentos sugeridos pela IA...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row marcado">
+        <div class="check-icon">●</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">4. Solicitação Indevida de Fotos</span>
+                <span class="item-cat cat-GRAVE">GRAVE</span>
+            </div>
+            <div class="item-desc">Solicitou correções ou envio de fotos adicionais de maneira incorreta...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row ">
+        <div class="check-icon">○</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">5. Orçamentação Incorreta (aplicável a EA)</span>
+                <span class="item-cat cat-GRAVE">GRAVE</span>
+            </div>
+            <div class="item-desc">Realizou orçamento incorreto, desconsiderando imagens, peças...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row ">
+        <div class="check-icon">○</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">6. Preenchimento Incorreto de Dados</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+            </div>
+            <div class="item-desc">Erro no preenchimento das informações da vistoria...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row marcado">
+        <div class="check-icon">●</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">7. Falta de Registro de Solicitação de Fotos e/ou observações</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+            </div>
+            <div class="item-desc">Não houve registro sobre solicitação de fotos adicionais...</div>
+        </div>
+    </div>
+    
+    
+    <div class="item-row ">
+        <div class="check-icon">○</div>
+        <div style="flex: 1;">
+            <div>
+                <span class="item-nome">8. Relato de Avarias</span>
+                <span class="item-cat cat-LEVE">LEVE</span>
+            </div>
+            <div class="item-desc">Não realizou o relato das avarias conforme as regras...</div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Observacoes -->
+
+<div class="card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Observacoes do Gestor</h3>
+    <p style="font-size: 14px; color: #334155; white-space: pre-wrap; margin: 0;">Avaliação geral abaixo do esperado. Pontos críticos discutidos com o perito em call 26/04.</p>
+</div>
+
+
+<!-- Back -->
+<a href="/dashboard" class="btn btn-secondary" style="margin-top: 8px;">← Voltar ao Dashboard</a>
+
+
+
+    </div>
+
+    
+<div style="position:fixed;bottom:16px;right:16px;background:#0f172a;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-family:monospace;z-index:99;box-shadow:0 4px 12px rgba(0,0,0,0.2);">v0.3 PREVIEW · preview_monitoria_detalhe_perito</div></body>
+</html>

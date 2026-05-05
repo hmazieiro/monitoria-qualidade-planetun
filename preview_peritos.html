@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Monitoria da Qualidade - Planetun{% endblock %}</title>
+    <title>Peritos - Monitoria da Qualidade</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
@@ -73,7 +73,7 @@
             .sidebar .sidebar-brand { display: none; }
             .main-content { margin-left: 0; padding: 16px; }
         }
-        {% block extra_css %}{% endblock %}
+        
     </style>
 </head>
 <body>
@@ -88,37 +88,109 @@
             </div>
         </div>
         <nav style="padding: 12px 0; flex: 1;">
-            <a href="/dashboard" class="{{ 'active' if request.path == '/dashboard' else '' }}">📊 Dashboard</a>
-            {% if session.usuario_perfil == 'supervisor' %}
-            <a href="/formulario" class="{{ 'active' if request.path == '/formulario' else '' }}">📋 Nova Monitoria</a>
-            {% endif %}
-            <a href="/historico" class="{{ 'active' if request.path.startswith('/historico') else '' }}">📅 Histórico</a>
-            {% if session.usuario_perfil == 'supervisor' %}
-            <a href="/peritos" class="{{ 'active' if request.path == '/peritos' else '' }}">👥 Peritos</a>
-            <a href="/produtos" class="{{ 'active' if request.path.startswith('/produtos') else '' }}">📦 Produtos</a>
-            {% endif %}
+            <a href="/dashboard" class="">📊 Dashboard</a>
+            
+            <a href="/formulario" class="">📋 Nova Monitoria</a>
+            
+            <a href="/historico" class="">📅 Histórico</a>
+            
+            <a href="/peritos" class="active">👥 Peritos</a>
+            <a href="/produtos" class="">📦 Produtos</a>
+            
         </nav>
-        {% if session.usuario_nome %}
+        
         <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
             <div style="color: #94a3b8; font-size: 12px;">Logado como</div>
-            <div style="color: #fff; font-size: 14px; font-weight: 600;">{{ session.usuario_nome }}</div>
+            <div style="color: #fff; font-size: 14px; font-weight: 600;">Henrique Mazieiro</div>
             <a href="/logout" style="color: #94a3b8; font-size: 12px; display: inline; padding: 0; margin-top: 4px;">Sair</a>
         </div>
-        {% endif %}
+        
     </div>
 
     <div class="main-content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        
+            
+        
 
-        {% block content %}{% endblock %}
+        
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">👥 Peritos</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Ranking e desempenho individual</p>
+    </div>
+</div>
+
+<div class="card" style="overflow-x: auto;">
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40px;">#</th>
+                <th>Perito</th>
+                <th>E-mail</th>
+                <th style="text-align: right;">Monitorias</th>
+                <th style="text-align: right;">Nota Média</th>
+                <th>Última avaliação</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td style="color: #94a3b8; font-weight: 700;">1</td>
+                <td style="font-weight: 600; color: #0f172a;">João Silva</td>
+                <td style="color: #64748b; font-size: 13px;">joao@planetun.com.br</td>
+                <td style="text-align: right; color: #334155;">5</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">
+                    70.0
+                </td>
+                <td style="color: #64748b;">2026-04-22</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td style="color: #94a3b8; font-weight: 700;">2</td>
+                <td style="font-weight: 600; color: #0f172a;">Carlos Pereira</td>
+                <td style="color: #64748b; font-size: 13px;">carlos@planetun.com.br</td>
+                <td style="text-align: right; color: #334155;">5</td>
+                <td style="text-align: right; font-weight: 700; color: #f59e0b;">
+                    62.0
+                </td>
+                <td style="color: #64748b;">2026-04-25</td>
+                <td>
+                    
+                    <span class="badge badge-yellow">Atenção</span>
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td style="color: #94a3b8; font-weight: 700;">3</td>
+                <td style="font-weight: 600; color: #0f172a;">Ana Souza</td>
+                <td style="color: #64748b; font-size: 13px;">ana@planetun.com.br</td>
+                <td style="text-align: right; color: #334155;">5</td>
+                <td style="text-align: right; font-weight: 700; color: #ef4444;">
+                    58.0
+                </td>
+                <td style="color: #64748b;">2026-04-18</td>
+                <td>
+                    
+                    <span class="badge badge-red">Crítico</span>
+                    
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+    
+</div>
+
     </div>
 
-    {% block extra_js %}{% endblock %}
+    
 </body>
 </html>

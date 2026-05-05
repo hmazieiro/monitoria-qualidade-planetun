@@ -1,326 +1,322 @@
 {% extends "base.html" %}
 
-{% block title %}Formulário de Monitoria - Monitoria da Qualidade{% endblock %}
+{% block title %}Nova Monitoria - Monitoria da Qualidade{% endblock %}
 
 {% block extra_css %}
 <style>
     .section-header {
-        padding: 1rem 1.5rem;
+        padding: 12px 20px;
         border-radius: 8px 8px 0 0;
         color: white;
         font-weight: 600;
-        margin-top: 2rem;
-        margin-bottom: 0;
+        font-size: 14px;
+        margin-top: 24px;
     }
-
-    .section-gravissima {
-        background: linear-gradient(135deg, #c0392b, #e74c3c);
-    }
-
-    .section-grave {
-        background: linear-gradient(135deg, #e07000, #ff850a);
-    }
-
-    .section-leve {
-        background: linear-gradient(135deg, #00266d, #007dfe);
-    }
-
+    .section-gravissima { background: var(--planetun-red); }
+    .section-grave { background: var(--planetun-orange); }
+    .section-leve { background: var(--planetun-blue); }
     .section-content {
-        border: 1px solid #ddd;
+        border: 1px solid var(--planetun-border);
         border-top: none;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+        padding: 20px;
+        margin-bottom: 20px;
         border-radius: 0 0 8px 8px;
+        background: #fff;
     }
-
     .item-group {
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 6px;
-        border-left: 4px solid #ddd;
-    }
-
-    .item-group.checked {
-        background-color: #fff3cd;
-        border-left-color: #dc3545;
-    }
-
-    .item-number {
-        display: inline-block;
-        background-color: #6c757d;
-        color: white;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 2rem;
-        font-weight: 600;
-        margin-right: 0.5rem;
-    }
-
-    .item-title {
-        font-weight: 600;
-        color: #333;
-        margin-left: 2.5rem;
-        display: block;
-        margin-bottom: 0.25rem;
-    }
-
-    .item-description {
-        font-size: 0.9rem;
-        color: #666;
-        margin-left: 2.5rem;
-        margin-bottom: 0.5rem;
-        font-style: italic;
-    }
-
-    .form-check {
-        margin-left: 2.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .score-box {
-        background: linear-gradient(135deg, #00266d 0%, #007dfe 100%);
-        color: white;
-        padding: 2rem;
+        margin-bottom: 12px;
+        padding: 16px;
+        background: #f8fafc;
         border-radius: 8px;
-        text-align: center;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 12px rgba(0, 38, 109, 0.3);
+        border-left: 4px solid var(--planetun-border);
+        transition: all 0.2s;
     }
-
-    .score-label {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+    .item-group.checked {
+        background: #fef3c7;
+        border-left-color: var(--planetun-red);
     }
-
-    .score-value {
-        font-size: 3.5rem;
+    .item-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #64748b;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 13px;
         font-weight: 700;
+        flex-shrink: 0;
     }
+    .item-title { font-weight: 600; color: #0f172a; font-size: 14px; }
+    .item-description { font-size: 13px; color: #64748b; margin-top: 4px; }
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        margin-left: 36px;
+        cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--planetun-red);
+    }
+    .checkbox-row label { font-size: 13px; color: #334155; cursor: pointer; }
+    .score-hero {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+        color: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .score-hero .score-label { font-size: 13px; opacity: 0.7; }
+    .score-hero .score-value { font-size: 48px; font-weight: 800; margin-top: 4px; }
 
-    .btn-submit {
-        background: linear-gradient(135deg, #ff850a, #e07000);
-        border: none;
-        padding: 0.75rem 2rem;
-        font-size: 1.05rem;
-        font-weight: 600;
-        width: 100%;
-        color: white;
+    /* Bloco expansível por critério marcado: observação + anexos */
+    .item-detalhes {
+        margin-top: 12px;
+        margin-left: 36px;
+        padding: 16px;
+        background: #fff;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        display: none;
     }
-
-    .btn-submit:hover {
-        background: linear-gradient(135deg, #e07000, #c06000);
-        color: white;
+    .item-group.checked .item-detalhes { display: block; }
+    .item-detalhes label.field-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #475569;
+        display: block;
+        margin-bottom: 6px;
     }
-
-    .form-section-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #333;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
+    .item-detalhes textarea { font-size: 13px; }
+    .file-drop {
+        border: 1px dashed var(--planetun-border);
+        border-radius: 8px;
+        padding: 14px;
+        background: #f8fafc;
+        font-size: 13px;
+        color: #64748b;
     }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    @media (max-width: 768px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-    }
+    .file-drop input[type="file"] { padding: 4px 0; background: transparent; border: none; }
+    .helper { color: #94a3b8; font-size: 12px; margin-top: 4px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h1>Formulário de Monitoria de Qualidade</h1>
-        <p class="text-muted">Preencha os dados abaixo para registrar uma nova monitoria</p>
+<!-- Page Header -->
+<div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">📋 Nova Monitoria</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Preencha os dados, marque as falhas encontradas e anexe evidências quando aplicável.</p>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="/formulario">
-            <!-- Score Display -->
-            <div class="score-box">
-                <div class="score-label">Nota Final Calculada</div>
-                <div class="score-value" id="scoreValue">100</div>
-            </div>
+<form method="POST" action="/formulario" enctype="multipart/form-data">
+    <!-- Score Display -->
+    <div class="score-hero">
+        <div class="score-label">NOTA FINAL CALCULADA</div>
+        <div class="score-value" id="scoreValue">100</div>
+    </div>
 
-            <!-- Section 1: Dados da Monitoria -->
-            <h5 class="form-section-title">Dados da Monitoria</h5>
+    <!-- Dados da Monitoria -->
+    <div class="card">
+        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">Dados da Monitoria</h3>
 
-            <div class="form-row">
-                <div>
-                    <label for="colaborador_id" class="form-label">Colaborador Avaliado (Perito)</label>
-                    <select class="form-select" id="colaborador_id" name="colaborador_id" required>
-                        <option value="">-- Selecione um perito --</option>
-                        {% for perito in peritos %}
-                        <option value="{{ perito.id }}">{{ perito.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="cliente_id" class="form-label">Cliente</label>
-                    <select class="form-select" id="cliente_id" name="cliente_id" required>
-                        <option value="">-- Selecione um cliente --</option>
-                        {% for cliente in clientes %}
-                        <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label for="avaliador" class="form-label">Avaliador (Supervisor)</label>
-                    <input type="text" class="form-control" id="avaliador" value="{{ avaliador_nome }}" disabled>
-                </div>
-                <div>
-                    <label for="numero_processo" class="form-label">Número do Processo</label>
-                    <input type="text" class="form-control" id="numero_processo" name="numero_processo">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label for="data_monitoria" class="form-label">Data da Monitoria</label>
-                    <input type="date" class="form-control" id="data_monitoria" name="data_monitoria" required>
-                </div>
-                <div>
-                    <label for="data_tratativa" class="form-label">Data da Tratativa</label>
-                    <input type="date" class="form-control" id="data_tratativa" name="data_tratativa">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label for="data_feedback" class="form-label">Data do Feedback</label>
-                    <input type="date" class="form-control" id="data_feedback" name="data_feedback">
-                </div>
-            </div>
-
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div>
-                <label for="observacoes" class="form-label">Observações do Gestor</label>
-                <textarea class="form-control" id="observacoes" name="observacoes" rows="4"></textarea>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Perito Avaliado *</label>
+                <select id="colaborador_id" name="colaborador_id" required>
+                    <option value="">Selecione um perito...</option>
+                    {% for perito in peritos %}
+                    <option value="{{ perito.id }}">{{ perito.nome }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Cliente *</label>
+                <select id="cliente_id" name="cliente_id" required>
+                    <option value="">Selecione um cliente...</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-            <!-- Section 2: Itens de Avaliação -->
-            <h5 class="form-section-title">Itens de Avaliação</h5>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Produto</label>
+                <select id="produto_id" name="produto_id">
+                    <option value="">Selecione um produto...</option>
+                    {% for produto in produtos %}
+                    <option value="{{ produto.id }}">{{ produto.nome }}</option>
+                    {% endfor %}
+                </select>
+                {% if not produtos %}
+                <p style="color: #94a3b8; font-size: 12px; margin: 4px 0 0 0;">
+                    Nenhum produto cadastrado. <a href="{{ url_for('produtos') }}" style="color: var(--planetun-blue); font-weight: 600;">Cadastre o primeiro</a>.
+                </p>
+                {% endif %}
+            </div>
+            <div></div>
+        </div>
 
-            <!-- FALHA GRAVÍSSIMA -->
-            <div class="section-header section-gravissima">
-                🔴 FALHA GRAVÍSSIMA (Se marcado, nota = 0)
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Avaliador (Supervisor)</label>
+                <input type="text" value="{{ avaliador_nome }}" disabled style="background: #f1f5f9; color: #64748b;">
             </div>
-            <div class="section-content">
-                {% for num in [1, 2, 3] %}
-                <div class="item-group" id="item-group-{{ num }}">
-                    <span class="item-number">{{ num }}</span>
-                    <span class="item-title">{{ items[num].nome }}</span>
-                    <span class="item-description">{{ items[num].descricao }}</span>
-                    <div class="form-check">
-                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
-                        <label class="form-check-label" for="item_{{ num }}">
-                            Falha encontrada
-                        </label>
-                    </div>
-                </div>
-                {% endfor %}
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Numero do Processo</label>
+                <input type="text" id="numero_processo" name="numero_processo" placeholder="Ex: 12345">
             </div>
+        </div>
 
-            <!-- FALHA GRAVE -->
-            <div class="section-header section-grave">
-                🟠 FALHA GRAVE (Cada uma: -60 pontos)
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data da Monitoria *</label>
+                <input type="date" id="data_monitoria" name="data_monitoria" value="{{ data_hoje }}" required>
             </div>
-            <div class="section-content">
-                {% for num in [4, 5] %}
-                <div class="item-group" id="item-group-{{ num }}">
-                    <span class="item-number">{{ num }}</span>
-                    <span class="item-title">{{ items[num].nome }}</span>
-                    <span class="item-description">{{ items[num].descricao }}</span>
-                    <div class="form-check">
-                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
-                        <label class="form-check-label" for="item_{{ num }}">
-                            Falha encontrada
-                        </label>
-                    </div>
-                </div>
-                {% endfor %}
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data da Tratativa</label>
+                <input type="date" id="data_tratativa" name="data_tratativa">
             </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Data do Feedback</label>
+                <input type="date" id="data_feedback" name="data_feedback">
+            </div>
+        </div>
 
-            <!-- FALHA LEVE -->
-            <div class="section-header section-leve">
-                🔵 FALHA LEVE (Cada uma: -40 pontos)
-            </div>
-            <div class="section-content">
-                {% for num in [6, 7, 8] %}
-                <div class="item-group" id="item-group-{{ num }}">
-                    <span class="item-number">{{ num }}</span>
-                    <span class="item-title">{{ items[num].nome }}</span>
-                    <span class="item-description">{{ items[num].descricao }}</span>
-                    <div class="form-check">
-                        <input class="form-check-input score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on">
-                        <label class="form-check-label" for="item_{{ num }}">
-                            Falha encontrada
-                        </label>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <button type="submit" class="btn btn-success btn-submit">Salvar Monitoria</button>
-        </form>
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Observacoes do Gestor</label>
+            <textarea id="observacoes" name="observacoes" rows="3" placeholder="Descreva aqui..."></textarea>
+        </div>
     </div>
-</div>
+
+    <!-- Itens de Avaliacao -->
+    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; margin-top: 32px;">Itens de Avaliacao</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Marque os itens onde foram identificadas falhas</p>
+
+    {% macro render_item(num) %}
+    <div class="item-group" id="item-group-{{ num }}">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <span class="item-number">{{ num }}</span>
+            <div style="flex: 1;">
+                <div class="item-title">{{ items[num].nome }}</div>
+                <div class="item-description">{{ items[num].descricao }}</div>
+                <div class="checkbox-row">
+                    <input class="score-trigger" type="checkbox" id="item_{{ num }}" name="item_{{ num }}" value="on" data-target="detalhes-{{ num }}">
+                    <label for="item_{{ num }}">Falha encontrada — registrar observação e evidência</label>
+                </div>
+                <div class="item-detalhes" id="detalhes-{{ num }}">
+                    <label class="field-label" for="obs_{{ num }}">Observação do avaliador</label>
+                    <textarea id="obs_{{ num }}" name="obs_{{ num }}" rows="3" placeholder="Descreva o que foi identificado neste critério..."></textarea>
+                    <div class="helper">Texto livre. Será anexado ao histórico da monitoria e visível ao perito.</div>
+
+                    <label class="field-label" for="arquivos_{{ num }}" style="margin-top: 14px;">Anexos / evidências</label>
+                    <div class="file-drop">
+                        <input type="file" id="arquivos_{{ num }}" name="arquivos_{{ num }}" multiple
+                               accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.heic,.docx,.xlsx,.csv,.txt,.mp4,.mov">
+                        <div class="helper" style="margin-top: 6px;">PDF, imagens, vídeo, planilha ou documento. Múltiplos arquivos permitidos. Limite total: 25 MB por monitoria.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endmacro %}
+
+    <!-- GRAVÍSSIMA -->
+    <div class="section-header section-gravissima">
+        🔴 FALHA GRAVÍSSIMA — Se marcado, nota = 0
+    </div>
+    <div class="section-content">
+        {% for num in [1, 2, 3] %}{{ render_item(num) }}{% endfor %}
+    </div>
+
+    <!-- GRAVE -->
+    <div class="section-header section-grave">
+        🟠 FALHA GRAVE — Cada uma: -60 pontos
+    </div>
+    <div class="section-content">
+        {% for num in [4, 5] %}{{ render_item(num) }}{% endfor %}
+    </div>
+
+    <!-- LEVE -->
+    <div class="section-header section-leve">
+        🔵 FALHA LEVE — Cada uma: -40 pontos
+    </div>
+    <div class="section-content">
+        {% for num in [6, 7, 8] %}{{ render_item(num) }}{% endfor %}
+    </div>
+
+    <!-- Submit -->
+    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+        <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-success" style="padding: 12px 32px; font-size: 15px;">Salvar Monitoria</button>
+    </div>
+</form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     function calculateScore() {
-        let score = 100;
-
-        // Check gravíssima (items 1-3)
-        const gravissima = [1, 2, 3].some(i => document.getElementById(`item_${i}`).checked);
+        var score = 100;
+        var gravissima = [1, 2, 3].some(function(i) { return document.getElementById('item_' + i).checked; });
         if (gravissima) {
             score = 0;
         } else {
-            // Deduct for grave (items 4-5)
-            const graveCount = [4, 5].filter(i => document.getElementById(`item_${i}`).checked).length;
+            var graveCount = [4, 5].filter(function(i) { return document.getElementById('item_' + i).checked; }).length;
             score -= graveCount * 60;
-
-            // Deduct for leve (items 6-8)
-            const leveCount = [6, 7, 8].filter(i => document.getElementById(`item_${i}`).checked).length;
+            var leveCount = [6, 7, 8].filter(function(i) { return document.getElementById('item_' + i).checked; }).length;
             score -= leveCount * 40;
         }
-
         score = Math.max(0, score);
         document.getElementById('scoreValue').textContent = score;
 
-        // Update visual feedback
-        for (let i = 1; i <= 8; i++) {
-            const itemGroup = document.getElementById(`item-group-${i}`);
-            if (document.getElementById(`item_${i}`).checked) {
-                itemGroup.classList.add('checked');
+        for (var i = 1; i <= 8; i++) {
+            var group = document.getElementById('item-group-' + i);
+            if (document.getElementById('item_' + i).checked) {
+                group.classList.add('checked');
             } else {
-                itemGroup.classList.remove('checked');
+                group.classList.remove('checked');
             }
         }
     }
 
-    document.querySelectorAll('.score-trigger').forEach(checkbox => {
-        checkbox.addEventListener('change', calculateScore);
+    document.querySelectorAll('.score-trigger').forEach(function(cb) {
+        cb.addEventListener('change', calculateScore);
+        // Ao desmarcar, limpa observação e arquivos do item correspondente
+        cb.addEventListener('change', function() {
+            if (!cb.checked) {
+                var num = cb.id.replace('item_', '');
+                var obs = document.getElementById('obs_' + num);
+                var files = document.getElementById('arquivos_' + num);
+                if (obs) obs.value = '';
+                if (files) files.value = '';
+            }
+        });
     });
 
-    // Set today's date as default
-    document.getElementById('data_monitoria').valueAsDate = new Date();
+    // Fallback defensivo: se o backend não preencheu (cache ou render legado),
+    // usa a data local do browser formatada manualmente — evita o bug de
+    // valueAsDate, que interpreta UTC e pode mostrar o dia seguinte no fuso BR.
+    (function() {
+        var input = document.getElementById('data_monitoria');
+        if (input && !input.value) {
+            var d = new Date();
+            var iso = d.getFullYear() + '-' +
+                      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(d.getDate()).padStart(2, '0');
+            input.value = iso;
+        }
+    })();
 </script>
 {% endblock %}
